@@ -31,14 +31,17 @@ export function sharePath(path) {
 
 // an IPv4 address keeps its first two parts, an IPv6 its first two groups
 export const maskIp = (ip) => (ip.includes(':') ? ip.split(':').slice(0, 2).join(':') + ':…' : ip.split('.').slice(0, 2).join('.') + '.*.*');
+// a domain loses its first label (home.example.net → *.example.net), the part that names a person
+export const maskAddr = (x) => (/^[\d.]+$|:/.test(x) ? maskIp(x) : '*.' + x.split('.').slice(1).join('.'));
 const r1 = (x) => (x == null ? null : Math.round(x * 10) / 10);
 const SRC = ['city', 'country', 'hostname', 'ix'];
 
 // last: { dir, target, ts, r: Globalping result (probe + result.hops), geo: Map ip -> place }, me: the visitor's IP
 // showIp: the visitor ticked "show my IP" in the share dialog; otherwise a return trace's target (them) is masked
 export function pack(last, me, showIp = false) {
-  const p = last.r.probe, hide = last.dir === 'back' && !showIp ? new Set([last.target, me].filter(Boolean)) : new Set();
-  const ip = (x) => (x && hide.has(x) ? maskIp(x) : x);
+  // a return trace hides its target, the address a domain target resolved to, and the visitor's own IP
+  const p = last.r.probe, hide = last.dir === 'back' && !showIp ? new Set([last.target, last.r.result.resolvedAddress, me].filter(Boolean)) : new Set();
+  const ip = (x) => (x && hide.has(x) ? maskAddr(x) : x);
   const g = {};
   for (const [k, v] of last.geo || []) if (v && !hide.has(k) && v.src !== 'local' && (v.lat != null || v.regOrg)) g[k] = [v.city || '', v.cc || '', r1(v.lat), r1(v.lon), Math.max(0, SRC.indexOf(v.src)), v.org || '', v.asn || 0, v.regOrg ? v.regOrg.slice(0, 120) : '', v.ix || ''];
   return {

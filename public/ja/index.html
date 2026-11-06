@@ -40,7 +40,7 @@
 <meta name="twitter:image" content="https://trace.1ms.dog/og/ja.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"ルートトレース · 1ms.dog","url":"https://trace.1ms.dog/ja/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"あなたと同じプロバイダのプローブから、任意のサイトやサーバーまでの経路をホップごとに表示。通るネットワークと回線、国境を越える場所、遠回りしている区間、パケットロスの起点がわかります。往路も復路も、地図付き。インストール不要。","inLanguage":"ja","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"誰の回線を測っているのですか？","acceptedAnswer":{"@type":"Answer","text":"Globalping は世界中の家庭回線やデータセンターに数千台のプローブを置いています。往路は、あなたと同じ事業者で、できれば同じ都市のプローブから出発し、あなたのような回線が宛先までどう届くかを示します。復路は宛先の近くのプローブから出発し、あなたの IP まで追います。プローブ自身の LAN は経路に数えません。"}},{"@type":"Question","name":"おすすめのプローブが自分の都市にないのはなぜ？","acceptedAnswer":{"@type":"Answer","text":"多くの都市には、あなたと同じ事業者のプローブがありません。事業者ごとの違い（バックボーンや国際回線）は都市の違いよりずっと大きいので、同じ事業者の別の都市のプローブを、同じ都市の別の事業者より上に並べています。プローブをタップすれば自分で選べます。"}},{"@type":"Question","name":"都市名の「?」は何ですか？","acceptedAnswer":{"@type":"Answer","text":"一部のバックボーンのアドレスはルーティングテーブルに載っておらず、データベースは登録地しか知りません（たとえば中国聯通国際のアドレスは香港で登録されています）。そうした場所には「?」を付け、地図では破線で描きます。前後のホップとの遅延と合わない場合（光ファイバーは往復 1 ミリ秒あたり約 100 km）は描きません。"}},{"@type":"Question","name":"リクエストはどこへ送られますか？","acceptedAnswer":{"@type":"Answer","text":"すべてあなたのブラウザから直接送られ、1ms.dog のサーバーは通りません。送り先は Globalping（プローブと測定。宛先と、復路ではあなたの IP を受け取り、結果は測定 ID で公開されます）、ipip.net・Cloudflare・ip.sb・ipinfo・GeoJS（出口 IP と各ホップの位置）、PeeringDB（IX）、RDAP（アドレスの登録情報）、公開 STUN サーバーです。"}},{"@type":"Question","name":"途中のホップにロスがあるのに、経路はロスなしなのはなぜ？","acceptedAnswer":{"@type":"Answer","text":"ルーターは測定パケットへの応答を後回しにし、よく返事をしません。あるホップで応答が欠けても、その先のホップがすべて正常なら、そのルーターが忙しかっただけです。終点まで続くロスだけが本当のロスです。"}},{"@type":"Question","name":"利用枠はどう数えますか？","acceptedAnswer":{"@type":"Answer","text":"Globalping は接続元の IP ごとに 1 時間 250 回まで、1 回のトレースで 1 回分です。プロキシ経由ならプロキシの出口で数えるので、同じ出口の人と共有になります。"}}]}]}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.91e3d1fee9.css">
+<link rel="stylesheet" href="/assets/app.97811307de.css">
 </head>
 <body>
 <div class="app">
@@ -87,7 +87,12 @@
             <div class="end-k" id="toK" data-i="to_label">宛先</div>
             <div class="to-box">
               <input id="target" autocomplete="off" spellcheck="false" placeholder="ドメインか IP（例：x.com）" aria-label="宛先">
-              <div id="meTarget" class="me-target" hidden></div>
+              <div id="backBox" class="combo" hidden>
+                <input id="backTo" autocomplete="off" spellcheck="false" placeholder="あなたの IP、または任意の IP / ドメイン" aria-label="復路の宛先" role="combobox" aria-expanded="false" aria-controls="backList" aria-describedby="backSub">
+                <span id="backSub" class="combo-sub m"></span>
+                <button type="button" id="backOpen" class="combo-btn" tabindex="-1" aria-label="検出したアドレス"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>
+                <div id="backList" class="combo-list" role="listbox" aria-label="検出したアドレス" hidden></div>
+              </div>
             </div>
           </div>
           <div class="end go-col">
@@ -148,7 +153,7 @@
 
 <script src="/assets/vendor/d3.min.js"></script>
 <script src="/assets/vendor/topojson-client.min.js"></script>
-<script src="/assets/l.ja.e47da9a2d9.js"></script>
-<script src="/assets/app.e614b29d89.js"></script>
+<script src="/assets/l.ja.552d759990.js"></script>
+<script src="/assets/app.456b2493d8.js"></script>
 </body>
 </html>

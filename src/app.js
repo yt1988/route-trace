@@ -38,7 +38,7 @@ const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? 
 
 const S = {
   slots: [], me: { groups: [], home: null, exits: [], ready: false }, dir: 'out', ref: 'home',
-  origin: null, originAuto: true, target: store.get('rt:target', ''), targetGeo: null,
+  origin: null, originAuto: true, target: store.get('rt:target', ''), targetGeo: null, backEdited: false,
   last: null, running: false, abort: null,
 };
 const elTarget = $('#target'); elTarget.value = S.target;
@@ -89,29 +89,16 @@ $('#optsBtn').addEventListener('click', () => { const open = $('#opts').hidden; 
 document.querySelectorAll('.seg2').forEach((g) => g.addEventListener('click', (e) => {
   const b = e.target.closest('button'); if (!b || b.disabled) return;
   g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b)); optsLabel();
-  if (g.dataset.opt === 'ipv') { renderMeTarget(); syncGo(); }
 }));
-// The IP choice follows the target, so the two never disagree. Return: the target is you, and the choice says which of
-// your addresses (IPv4 or IPv6) to trace back to; "auto" has no meaning there. Outbound: a domain can resolve either
-// way, so all three apply; an IP address is one family already, and the choice is locked to it.
-const isV4 = (x) => /^\d+\.\d+\.\d+\.\d+$/.test(x || ''), isV6 = (x) => String(x || '').includes(':');
-function myIps() { const who = backWho(); return { v4: who?.ips?.find(isV4) || (isV4(who?.ip) ? who.ip : null), v6: who?.ips?.find(isV6) || null, who }; }
+// The IP choice only means something when the target is a domain: it picks which of the domain's addresses the probe
+// traces to. An IP address is one family already, so the choice is hidden then, in both directions.
+const isV4 = (x) => /^\d+\.\d+\.\d+\.\d+$/.test(x || ''), isV6 = (x) => /^[0-9a-f:]+:[0-9a-f:]*$/i.test(x || '');
+const isIp = (x) => isV4(x) || isV6(x);
+const curTarget = () => (S.dir === 'out' ? S.target : backTarget());
 function syncIp() {
-  const g = document.querySelector('.seg2[data-opt="ipv"]'), btn = (v) => g.querySelector(`[data-v="${v}"]`);
-  const set = (v) => g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x.dataset.v === v));
-  const allow = (v, ok, why) => { const b = btn(v); b.disabled = !ok; b.hidden = false; b.title = ok ? '' : why || ''; };
-  if (S.dir === 'back') {
-    const { v4, v6 } = myIps();
-    btn('').hidden = true;
-    allow('4', !!v4, t('ip_no4')); allow('6', !!v6, t('ip_no6'));
-    const cur = opt('ipv');
-    if (!cur || (cur === '4' && !v4) || (cur === '6' && !v6)) set(v4 ? '4' : v6 ? '6' : '4');
-  } else {
-    btn('').hidden = false;
-    const lit = isV4(S.target) ? '4' : isV6(S.target) ? '6' : null;
-    allow('', !lit, lit && t('ip_locked', { v: lit })); allow('4', !lit || lit === '4', t('ip_locked', { v: lit })); allow('6', !lit || lit === '6', t('ip_locked', { v: lit }));
-    if (lit) set(lit); else if (!opt('ipv') && !optBtn('ipv')) set('');
-  }
+  const g = document.querySelector('.seg2[data-opt="ipv"]'), x = curTarget(), show = !!x && !isIp(x);
+  g.closest('.opt').hidden = !show;
+  if (!show) g.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === ''));
   optsLabel();
 }
 
@@ -183,15 +170,62 @@ function renderExits() {
   const eg = tool('egress');
   if (xs.length && eg) parts.push(`<a class="ext" href="${eg}${langDir()}" target="_blank" rel="noopener">${esc(t('to_egress'))}${EXT}</a>`);
   $('#exits').innerHTML = parts.join('') || (S.me.ready ? esc(t('me_none')) : `<span class="spin sm"></span>${esc(t('me_detecting'))}`);
-  renderMeTarget(); syncIp();
+  renderBackTo(); syncIp(); syncGo();
 }
-function backWho() { return S.ref.startsWith('x') ? S.me.exits[+S.ref.slice(1)] || S.me.home : S.me.home; }
-// which of your addresses a return trace goes to: the IP choice's family
-function backTarget() { const { v4, v6, who } = myIps(); return (opt('ipv') === '6' ? v6 : v4) || v4 || v6 || who?.ip || null; }
-function renderMeTarget() {
-  const who = backWho(), ip = backTarget();
-  $('#meTarget').innerHTML = who && ip ? `<b>${esc(ip)}</b><span class="m">${esc(netName(who))}</span>` : `<span class="m">${esc(t('ip_none'))}</span>`;
+// Return: the target is usually you, so the field offers your detected addresses (your line's IPv4 and IPv6, each proxy
+// exit's) and starts on your line's. It stays an ordinary field: a wrong guess is corrected, and any IP or domain (a
+// home DDNS name, a server you run) can be typed in, so a return trace can go anywhere.
+function backOpts() {
+  const out = [];
+  const add = (g, kind) => {
+    if (!g) return;
+    [...new Set([...(g.ips || []), g.ip].filter(isIp))].sort((a, b) => isV6(a) - isV6(b)).forEach((ip) => out.push({ ip, g, kind }));
+  };
+  add(S.me.home, S.me.home?.proxy ? 'exit' : 'home'); S.me.exits.forEach((x) => add(x, 'exit'));
+  return out;
 }
+const elBack = $('#backTo');
+function backTarget() { return elBack.value.trim(); }
+// the detected network a return target belongs to; null for one typed in
+function backWho(ip = backTarget()) { return backOpts().find((o) => o.ip === ip)?.g || null; }
+function renderBackTo() {
+  const o = backOpts();
+  if (!S.backEdited && o[0]) elBack.value = o[0].ip;   // follows detection until the visitor changes it
+  const who = backWho();
+  $('#backSub').textContent = who ? netName(who) : elBack.value ? t('back_custom') : S.me.ready ? t('back_none') : t('me_detecting');
+  $('#backOpen').hidden = !o.length;
+  if (!$('#backList').hidden) backList();
+}
+function backList() {
+  const cur = backTarget();
+  $('#backList').innerHTML = backOpts().map((x, i) => `<button type="button" role="option" data-i="${i}" aria-selected="${x.ip === cur}"><b>${esc(x.ip)}</b><span class="m">${esc(t(x.kind === 'home' ? 'ex_home' : 'ex_exit'))} · ${esc(netName(x.g))}</span></button>`).join('');
+}
+function backShow(on) {
+  if (on && !backOpts().length) on = false;
+  $('#backList').hidden = !on; elBack.setAttribute('aria-expanded', on);
+  if (on) backList();
+}
+function backSet() { S.backEdited = true; renderBackTo(); syncIp(); syncGo(); }
+elBack.addEventListener('focus', () => backShow(true));
+elBack.addEventListener('click', () => backShow(true));
+elBack.addEventListener('input', backSet);
+elBack.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') backShow(false);
+  else if (e.key === 'ArrowDown') { e.preventDefault(); backShow(true); $('#backList button')?.focus(); }
+  else if (e.key === 'Enter') { backShow(false); if (!$('#go').disabled) run(); }
+});
+$('#backOpen').addEventListener('click', () => { const on = $('#backList').hidden; backShow(on); if (on) elBack.focus(); });
+$('#backList').addEventListener('mousedown', (e) => e.preventDefault());   // the field keeps its focus while choosing
+$('#backList').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-i]'); if (!b) return;
+  elBack.value = backOpts()[+b.dataset.i].ip; backShow(false); backSet(); elBack.focus();
+});
+$('#backList').addEventListener('keydown', (e) => {
+  const bs = [...$('#backList').querySelectorAll('button')], i = bs.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); (bs[i + (e.key === 'ArrowDown' ? 1 : -1)] || elBack).focus(); }
+  else if (e.key === 'Escape') { backShow(false); elBack.focus(); }
+});
+$('#backBox').addEventListener('focusout', (e) => { if (!$('#backBox').contains(e.relatedTarget)) backShow(false); });
 
 // ---------- the map before a run: you, your exits and the chosen probe ----------
 function idleGlobe() {
@@ -215,12 +249,13 @@ document.querySelectorAll('.dir [data-dir]').forEach((b) => b.addEventListener('
   if (S.running || b.getAttribute('aria-selected') === 'true') return;
   S.dir = b.dataset.dir;
   document.querySelectorAll('.dir [data-dir]').forEach((x) => x.setAttribute('aria-selected', x === b));
-  elTarget.hidden = S.dir === 'back'; $('#meTarget').hidden = S.dir === 'out';
+  elTarget.hidden = S.dir === 'back'; $('#backBox').hidden = S.dir === 'out';
   S.ref = S.dir === 'out' ? 'home' : 'target';
   S.originAuto = true;
-  syncIp(); renderMeTarget();
+  renderBackTo(); syncIp();
+  // a return trace starts near the far end, the outbound target; without one the probe is picked by hand
   if (S.dir === 'back') {
-    if (!S.target) { S.origin = null; $('#originBtn').innerHTML = `<span class="m">${esc(t('back_need'))}</span>`; syncGo(); return; }
+    if (!S.target) { S.origin = null; renderOrigin(); syncGo(); return; }
     await locateTarget();
   }
   autoPick(); syncGo();
@@ -229,12 +264,12 @@ elTarget.addEventListener('input', () => { S.target = elTarget.value.trim(); sto
 elTarget.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !$('#go').disabled) run(); });
 $('#go').addEventListener('click', () => (S.running ? S.abort?.abort() : run()));
 function syncGo() {
-  const ok = S.origin && (S.dir === 'out' ? validTarget(S.target) : !!backWho());
+  const ok = S.origin && validTarget(curTarget());
   $('#go').disabled = !S.running && !ok;
   $('#go').textContent = S.running ? t('stop') : t('go');
   $('#go').classList.toggle('stop', S.running);
 }
-const validTarget = (t) => /^[a-z0-9.-]+\.[a-z0-9-]{2,}$/i.test(t) || /^\d+\.\d+\.\d+\.\d+$/.test(t) || /^[0-9a-f:]+:[0-9a-f:]*$/i.test(t);
+const validTarget = (t) => /^[a-z0-9.-]+\.[a-z0-9-]{2,}$/i.test(t || '') || isIp(t);
 
 // The target's place, for a probe next to it (return direction). Anycast addresses have no single place and geo
 // databases park them at the country's centre, so a finished outbound trace's end point wins.
@@ -606,11 +641,12 @@ function litStop(id, on) {
 // ---------- sharing (the 1ms.dog share component, copied verbatim to /assets/share/) ----------
 const SHARE = '/assets/share/share.js?v=8';
 let banner = null;
-// A return trace's target is the visitor's own address. The share dialog's box (unticked every time it opens) decides
-// whether the card and the link show it; unticked, both keep only its first half. An outbound trace's target is a
-// site or server the visitor chose, not them.
+// A return trace's target is usually the visitor's own address, or a name that points at it (a home DDNS name). The
+// share dialog's box (unticked every time it opens) decides whether the card and the link show it; unticked, both keep
+// only its first half (an IP) or drop its first label (a domain). An outbound trace's target is a site or server the
+// visitor chose, not them.
 const ownIp = () => S.last.dir === 'back';
-const shownTarget = (show) => (ownIp() && !show ? C.maskIp(S.last.target) : S.last.target);
+const shownTarget = (show) => (ownIp() && !show ? C.maskAddr(S.last.target) : S.last.target);
 // the link opens in the language it was shared from: /<lang>/r/<code>
 const resultLink = async (show) => `${location.origin}${PATHS[LANG] || "/"}r/${await C.encodeResult(C.pack(S.last, S.me.home?.ip, !!show))}`;
 // someone else's result: shown as it was, under the banner that offers the visitor's own trace of the same target

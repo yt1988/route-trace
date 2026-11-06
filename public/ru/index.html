@@ -40,7 +40,7 @@
 <meta name="twitter:image" content="https://trace.1ms.dog/og/ru.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Трассировка маршрута · 1ms.dog","url":"https://trace.1ms.dog/ru/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Трассировка до любого сайта или сервера с зонда в вашей же сети: каждый хоп, сети и линии на пути, где маршрут уходит за границу, какой участок делает крюк и где теряются пакеты. Туда и обратно, на карте. Ничего не нужно устанавливать.","inLanguage":"ru","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Чью сеть трассируют?","acceptedAnswer":{"@type":"Answer","text":"У Globalping тысячи зондов на домашних линиях и в дата-центрах по всему миру. Путь «Туда» начинается с зонда вашего оператора, по возможности в вашем городе, и показывает, как сеть вроде вашей доходит до цели. Путь «Обратно» начинается с зонда рядом с целью и идёт до вашего IP. Локальная сеть зонда не считается."}},{"@type":"Question","name":"Почему предложенный зонд не в моём городе?","acceptedAnswer":{"@type":"Answer","text":"Во многих городах нет зондов вашего оператора. Операторы различаются гораздо сильнее, чем города (у каждого своя магистраль и свои международные линии), поэтому тот же оператор в другом городе стоит выше другого оператора в вашем. Нажмите на зонд, чтобы выбрать свой."}},{"@type":"Question","name":"Что значит город со знаком вопроса?","acceptedAnswer":{"@type":"Answer","text":"Некоторые адреса магистралей не анонсируются в таблице маршрутов, и геобаза знает только, где зарегистрирован блок (у China Unicom Global, например, в Гонконге). Такие места помечены вопросом и пунктиром на карте и убираются, если задержка до соседних хопов их исключает (свет в оптике проходит около 100 км за миллисекунду туда и обратно)."}},{"@type":"Question","name":"Куда уходят запросы?","acceptedAnswer":{"@type":"Answer","text":"Напрямую из вашего браузера, никогда через сервер 1ms.dog: в Globalping (зонды и трассировка; он получает цель, а на обратном пути и ваш IP, и хранит результаты доступными по ID), в ipip.net, Cloudflare, ip.sb, ipinfo и GeoJS (ваши IP выхода и место каждого хопа), PeeringDB (точки обмена), RDAP (кто зарегистрировал адрес) и публичные STUN-серверы."}},{"@type":"Question","name":"Почему у хопа есть потери, а у маршрута нет?","acceptedAnswer":{"@type":"Answer","text":"Маршрутизаторы отвечают на пакеты трассировки в последнюю очередь, а часто не отвечают вовсе. Если хоп пропускает ответы, а все следующие в порядке, этот маршрутизатор был просто занят; считаются только потери, которые тянутся до конца маршрута."}},{"@type":"Question","name":"Как считается лимит?","acceptedAnswer":{"@type":"Answer","text":"Globalping считает по IP, с которого к нему обращаются: 250 трассировок в час, одна на трассировку. Через прокси считается выход прокси, общий для всех на нём."}}]}]}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.91e3d1fee9.css">
+<link rel="stylesheet" href="/assets/app.97811307de.css">
 </head>
 <body>
 <div class="app">
@@ -87,7 +87,12 @@
             <div class="end-k" id="toK" data-i="to_label">Куда</div>
             <div class="to-box">
               <input id="target" autocomplete="off" spellcheck="false" placeholder="Домен или IP, например x.com" aria-label="Цель">
-              <div id="meTarget" class="me-target" hidden></div>
+              <div id="backBox" class="combo" hidden>
+                <input id="backTo" autocomplete="off" spellcheck="false" placeholder="Ваш IP или любой IP / домен" aria-label="Цель обратного пути" role="combobox" aria-expanded="false" aria-controls="backList" aria-describedby="backSub">
+                <span id="backSub" class="combo-sub m"></span>
+                <button type="button" id="backOpen" class="combo-btn" tabindex="-1" aria-label="Найденные адреса"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>
+                <div id="backList" class="combo-list" role="listbox" aria-label="Найденные адреса" hidden></div>
+              </div>
             </div>
           </div>
           <div class="end go-col">
@@ -148,7 +153,7 @@
 
 <script src="/assets/vendor/d3.min.js"></script>
 <script src="/assets/vendor/topojson-client.min.js"></script>
-<script src="/assets/l.ru.599c720412.js"></script>
-<script src="/assets/app.e614b29d89.js"></script>
+<script src="/assets/l.ru.e801d1e8a2.js"></script>
+<script src="/assets/app.456b2493d8.js"></script>
 </body>
 </html>

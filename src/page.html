@@ -53,7 +53,12 @@
             <div class="end-k" id="toK" data-i="to_label"></div>
             <div class="to-box">
               <input id="target" autocomplete="off" spellcheck="false" placeholder="{{a:target_ph}}" aria-label="{{a:a_target}}">
-              <div id="meTarget" class="me-target" hidden></div>
+              <div id="backBox" class="combo" hidden>
+                <input id="backTo" autocomplete="off" spellcheck="false" placeholder="{{a:back_ph}}" aria-label="{{a:a_back_to}}" role="combobox" aria-expanded="false" aria-controls="backList" aria-describedby="backSub">
+                <span id="backSub" class="combo-sub m"></span>
+                <button type="button" id="backOpen" class="combo-btn" tabindex="-1" aria-label="{{a:a_back_list}}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>
+                <div id="backList" class="combo-list" role="listbox" aria-label="{{a:a_back_list}}" hidden></div>
+              </div>
             </div>
           </div>
           <div class="end go-col">

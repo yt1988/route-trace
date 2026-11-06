@@ -40,7 +40,7 @@
 <meta name="twitter:image" content="https://trace.1ms.dog/og/es.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Traza de ruta · 1ms.dog","url":"https://trace.1ms.dog/es/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Traza la ruta hasta cualquier web o servidor desde una sonda en tu propia red: cada salto, las redes y líneas que cruza, dónde sale del país, qué tramo da un rodeo y dónde se pierden paquetes. Ida y vuelta, dibujadas en un mapa. Sin instalar nada.","inLanguage":"es","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿De quién es la red que se traza?","acceptedAnswer":{"@type":"Answer","text":"Globalping tiene miles de sondas en líneas domésticas y centros de datos de todo el mundo. La ida parte de una sonda de tu mismo operador, en tu ciudad si es posible, y muestra cómo una red como la tuya llega al destino. La vuelta parte de una sonda cerca del destino y traza el camino hasta tu IP. La red local de la sonda no se cuenta."}},{"@type":"Question","name":"¿Por qué la sonda sugerida no está en mi ciudad?","acceptedAnswer":{"@type":"Answer","text":"Muchas ciudades no tienen ninguna sonda de tu operador. Los operadores se diferencian mucho más que las ciudades (cada uno tiene su red troncal y sus enlaces internacionales), así que el mismo operador en otra ciudad va por delante de otro operador en la tuya. Toca la sonda para elegir otra."}},{"@type":"Question","name":"¿Qué significa una ciudad con interrogación?","acceptedAnswer":{"@type":"Answer","text":"Algunas direcciones de redes troncales no se anuncian en la tabla de rutas, así que una base de datos solo sabe dónde está registrado el bloque (las de China Unicom Global, por ejemplo, en Hong Kong). Esos lugares llevan un interrogante y una línea discontinua en el mapa, y se omiten cuando la latencia con los saltos de alrededor los descarta (la luz en fibra recorre unos 100 km por milisegundo de ida y vuelta)."}},{"@type":"Question","name":"¿A dónde van las peticiones?","acceptedAnswer":{"@type":"Answer","text":"Directamente desde tu navegador, nunca a través de un servidor de 1ms.dog: a Globalping (las sondas y la traza; recibe el destino, y tu IP en una traza de vuelta, y guarda los resultados accesibles por su ID), a ipip.net, Cloudflare, ip.sb, ipinfo y GeoJS (tus IP de salida y dónde está cada salto), a PeeringDB (puntos de intercambio), a RDAP (quién registró una dirección) y a servidores STUN públicos."}},{"@type":"Question","name":"¿Por qué un salto muestra pérdida si la ruta no la tiene?","acceptedAnswer":{"@type":"Answer","text":"Los routers responden a las sondas en último lugar y a menudo no responden. Si un salto deja respuestas sin dar pero todos los siguientes van bien, ese router solo estaba ocupado; solo cuenta la pérdida que dura hasta el final de la ruta."}},{"@type":"Question","name":"¿Cómo se cuenta la cuota?","acceptedAnswer":{"@type":"Answer","text":"Globalping cuenta por la IP que le llega: 250 trazas por hora, una por traza. Detrás de un proxy cuenta la salida del proxy, compartida por todos los que la usan."}}]}]}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.91e3d1fee9.css">
+<link rel="stylesheet" href="/assets/app.97811307de.css">
 </head>
 <body>
 <div class="app">
@@ -87,7 +87,12 @@
             <div class="end-k" id="toK" data-i="to_label">Hasta</div>
             <div class="to-box">
               <input id="target" autocomplete="off" spellcheck="false" placeholder="Dominio o IP, p. ej. x.com" aria-label="Destino">
-              <div id="meTarget" class="me-target" hidden></div>
+              <div id="backBox" class="combo" hidden>
+                <input id="backTo" autocomplete="off" spellcheck="false" placeholder="Tu IP, o cualquier IP o dominio" aria-label="Destino de la vuelta" role="combobox" aria-expanded="false" aria-controls="backList" aria-describedby="backSub">
+                <span id="backSub" class="combo-sub m"></span>
+                <button type="button" id="backOpen" class="combo-btn" tabindex="-1" aria-label="Direcciones detectadas"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>
+                <div id="backList" class="combo-list" role="listbox" aria-label="Direcciones detectadas" hidden></div>
+              </div>
             </div>
           </div>
           <div class="end go-col">
@@ -148,7 +153,7 @@
 
 <script src="/assets/vendor/d3.min.js"></script>
 <script src="/assets/vendor/topojson-client.min.js"></script>
-<script src="/assets/l.es.4e897280f1.js"></script>
-<script src="/assets/app.e614b29d89.js"></script>
+<script src="/assets/l.es.9d9701784e.js"></script>
+<script src="/assets/app.456b2493d8.js"></script>
 </body>
 </html>
