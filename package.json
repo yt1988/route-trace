@@ -1,0 +1,20 @@
+{
+  "name": "route-trace",
+  "private": true,
+  "type": "module",
+  "description": "Route Trace: an online traceroute (MTR) with a map, from a Globalping probe that looks like your own network, run from your browser",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/build.mjs --check && node --test \"test/*.test.mjs\"",
+    "assets": "node scripts/assets.mjs",
+    "dev": "wrangler dev --port 8807",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "esbuild": "0.25.10"
+  },
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/yt1988/route-trace" },
+  "homepage": "https://trace.1ms.dog"
+}

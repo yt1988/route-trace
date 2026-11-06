@@ -1,0 +1,406 @@
+{
+ "note": "Reconstructed from a real return trace (a Los Angeles DMIT probe to a China Unicom home line, via CUG and 9929, 2026-11-06); registry names from RDAP, places from GeoJS; the visitor address is TEST-NET-3",
+ "probe": {
+  "continent": "NA",
+  "country": "US",
+  "city": "Los Angeles",
+  "asn": 906,
+  "latitude": 34.05,
+  "longitude": -118.24,
+  "network": "DMIT Cloud Services",
+  "tags": [
+   "datacenter-network"
+  ]
+ },
+ "hops": [
+  {
+   "resolvedAddress": "193.41.250.250",
+   "resolvedHostname": "_gateway",
+   "asn": [],
+   "stats": {
+    "min": 0.1,
+    "avg": 1.1,
+    "max": 2.1,
+    "jAvg": 1,
+    "loss": 0,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  },
+  {
+   "resolvedAddress": "193.41.250.159",
+   "resolvedHostname": "irb-50.er01.lax.DMIT.com",
+   "asn": [],
+   "stats": {
+    "min": 0.3,
+    "avg": 1.3,
+    "max": 2.3,
+    "jAvg": 1,
+    "loss": 0,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  },
+  {
+   "resolvedAddress": null,
+   "resolvedHostname": null,
+   "asn": [],
+   "stats": {
+    "min": null,
+    "avg": null,
+    "max": null,
+    "loss": 100,
+    "rcv": 0,
+    "total": 10
+   }
+  },
+  {
+   "resolvedAddress": null,
+   "resolvedHostname": null,
+   "asn": [],
+   "stats": {
+    "min": null,
+    "avg": null,
+    "max": null,
+    "loss": 100,
+    "rcv": 0,
+    "total": 10
+   }
+  },
+  {
+   "resolvedAddress": "118.26.151.30",
+   "resolvedHostname": "118.26.151.30",
+   "asn": [],
+   "stats": {
+    "min": 0.4,
+    "avg": 1.4,
+    "max": 2.4,
+    "jAvg": 1,
+    "loss": 0,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  },
+  {
+   "resolvedAddress": "118.26.151.29",
+   "resolvedHostname": "118.26.151.29",
+   "asn": [],
+   "stats": {
+    "min": 0.6,
+    "avg": 1.6,
+    "max": 2.6,
+    "jAvg": 1,
+    "loss": 0,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  },
+  {
+   "resolvedAddress": "162.219.85.5",
+   "resolvedHostname": "162.219.85.5",
+   "asn": [],
+   "stats": {
+    "min": 128,
+    "avg": 129,
+    "max": 130,
+    "jAvg": 1,
+    "loss": 0,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  },
+  {
+   "resolvedAddress": "218.105.2.89",
+   "resolvedHostname": "218.105.2.89",
+   "asn": [
+    9929
+   ],
+   "stats": {
+    "min": 138,
+    "avg": 139,
+    "max": 140,
+    "jAvg": 1,
+    "loss": 30,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  },
+  {
+   "resolvedAddress": "218.105.131.101",
+   "resolvedHostname": "218.105.131.101",
+   "asn": [
+    9929
+   ],
+   "stats": {
+    "min": 151,
+    "avg": 152,
+    "max": 153,
+    "jAvg": 1,
+    "loss": 0,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  },
+  {
+   "resolvedAddress": "210.78.30.158",
+   "resolvedHostname": "210.78.30.158",
+   "asn": [],
+   "stats": {
+    "min": 151,
+    "avg": 152,
+    "max": 153,
+    "jAvg": 1,
+    "loss": 0,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  },
+  {
+   "resolvedAddress": null,
+   "resolvedHostname": null,
+   "asn": [],
+   "stats": {
+    "min": null,
+    "avg": null,
+    "max": null,
+    "loss": 100,
+    "rcv": 0,
+    "total": 10
+   }
+  },
+  {
+   "resolvedAddress": null,
+   "resolvedHostname": null,
+   "asn": [],
+   "stats": {
+    "min": null,
+    "avg": null,
+    "max": null,
+    "loss": 100,
+    "rcv": 0,
+    "total": 10
+   }
+  },
+  {
+   "resolvedAddress": "125.33.186.254",
+   "resolvedHostname": "125.33.186.254",
+   "asn": [
+    4808
+   ],
+   "stats": {
+    "min": 151,
+    "avg": 152,
+    "max": 153,
+    "jAvg": 1,
+    "loss": 20,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  },
+  {
+   "resolvedAddress": "61.48.27.142",
+   "resolvedHostname": "61.48.27.142",
+   "asn": [
+    4808
+   ],
+   "stats": {
+    "min": 153,
+    "avg": 154,
+    "max": 155,
+    "jAvg": 1,
+    "loss": 0,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  },
+  {
+   "resolvedAddress": "203.0.113.9",
+   "resolvedHostname": "203.0.113.9",
+   "asn": [
+    4808
+   ],
+   "stats": {
+    "min": 158,
+    "avg": 159,
+    "max": 160,
+    "jAvg": 1,
+    "loss": 0,
+    "rcv": 10,
+    "total": 10,
+    "drop": 0
+   }
+  }
+ ],
+ "geo": [
+  {
+   "accuracy": 1000,
+   "area_code": "0",
+   "asn": 64512,
+   "continent_code": "NA",
+   "country": "United States",
+   "country_code": "US",
+   "country_code3": "USA",
+   "ip": "193.41.250.250",
+   "latitude": "37.751",
+   "longitude": "-97.822",
+   "organization": "AS64512 Unknown",
+   "organization_name": "Unknown",
+   "timezone": "America/Chicago"
+  },
+  {
+   "accuracy": 1000,
+   "area_code": "0",
+   "asn": 64512,
+   "continent_code": "NA",
+   "country": "United States",
+   "country_code": "US",
+   "country_code3": "USA",
+   "ip": "193.41.250.159",
+   "latitude": "37.751",
+   "longitude": "-97.822",
+   "organization": "AS64512 Unknown",
+   "organization_name": "Unknown",
+   "timezone": "America/Chicago"
+  },
+  {
+   "accuracy": 1000,
+   "area_code": "0",
+   "asn": 64512,
+   "continent_code": "AS",
+   "country": "Hong Kong",
+   "country_code": "HK",
+   "country_code3": "HKG",
+   "ip": "118.26.151.30",
+   "latitude": "22.2578",
+   "longitude": "114.1657",
+   "organization": "AS64512 Unknown",
+   "organization_name": "Unknown",
+   "timezone": "Asia/Hong_Kong"
+  },
+  {
+   "accuracy": 1000,
+   "area_code": "0",
+   "asn": 64512,
+   "continent_code": "AS",
+   "country": "Hong Kong",
+   "country_code": "HK",
+   "country_code3": "HKG",
+   "ip": "118.26.151.29",
+   "latitude": "22.2578",
+   "longitude": "114.1657",
+   "organization": "AS64512 Unknown",
+   "organization_name": "Unknown",
+   "timezone": "Asia/Hong_Kong"
+  },
+  {
+   "accuracy": 20,
+   "area_code": "0",
+   "asn": 64512,
+   "city": "Tsim Sha Tsui",
+   "continent_code": "AS",
+   "country": "Hong Kong",
+   "country_code": "HK",
+   "country_code3": "HKG",
+   "ip": "162.219.85.5",
+   "latitude": "22.3",
+   "longitude": "114.1667",
+   "organization": "AS64512 Unknown",
+   "organization_name": "Unknown",
+   "region": "Kowloon City",
+   "timezone": "Asia/Hong_Kong"
+  },
+  {
+   "accuracy": 1000,
+   "area_code": "0",
+   "asn": 9929,
+   "continent_code": "AS",
+   "country": "China",
+   "country_code": "CN",
+   "country_code3": "CHN",
+   "ip": "218.105.2.89",
+   "latitude": "34.7732",
+   "longitude": "113.722",
+   "organization": "AS9929 CHINA UNICOM Industrial Internet Backbone",
+   "organization_name": "CHINA UNICOM Industrial Internet Backbone",
+   "timezone": "Asia/Shanghai"
+  },
+  {
+   "accuracy": 1000,
+   "area_code": "0",
+   "asn": 9929,
+   "continent_code": "AS",
+   "country": "China",
+   "country_code": "CN",
+   "country_code3": "CHN",
+   "ip": "218.105.131.101",
+   "latitude": "34.7732",
+   "longitude": "113.722",
+   "organization": "AS9929 CHINA UNICOM Industrial Internet Backbone",
+   "organization_name": "CHINA UNICOM Industrial Internet Backbone",
+   "timezone": "Asia/Shanghai"
+  },
+  {
+   "accuracy": 1000,
+   "area_code": "0",
+   "asn": 64512,
+   "continent_code": "AS",
+   "country": "China",
+   "country_code": "CN",
+   "country_code3": "CHN",
+   "ip": "210.78.30.158",
+   "latitude": "34.7732",
+   "longitude": "113.722",
+   "organization": "AS64512 Unknown",
+   "organization_name": "Unknown",
+   "timezone": "Asia/Shanghai"
+  },
+  {
+   "accuracy": 1000,
+   "area_code": "0",
+   "asn": 4808,
+   "continent_code": "AS",
+   "country": "China",
+   "country_code": "CN",
+   "country_code3": "CHN",
+   "ip": "125.33.186.254",
+   "latitude": "34.7732",
+   "longitude": "113.722",
+   "organization": "AS4808 China Unicom Beijing Province Network",
+   "organization_name": "China Unicom Beijing Province Network",
+   "timezone": "Asia/Shanghai"
+  },
+  {
+   "accuracy": 1000,
+   "area_code": "0",
+   "asn": 4808,
+   "continent_code": "AS",
+   "country": "China",
+   "country_code": "CN",
+   "country_code3": "CHN",
+   "ip": "61.48.27.142",
+   "latitude": "34.7732",
+   "longitude": "113.722",
+   "organization": "AS4808 China Unicom Beijing Province Network",
+   "organization_name": "China Unicom Beijing Province Network",
+   "timezone": "Asia/Shanghai"
+  }
+ ],
+ "reg": {
+  "193.41.250.250": "US-DMITINC DMIT Backbone - Frankfurt DMIT Network Operation Center",
+  "193.41.250.159": "US-DMITINC DMIT Backbone - Frankfurt DMIT Network Operation Center",
+  "118.26.151.30": "UNICOM-HK China Unicom (Hong Kong) Operations Limited Telecommunication carrier, ISP. Hong Kong SAR, China.",
+  "118.26.151.29": "UNICOM-HK China Unicom (Hong Kong) Operations Limited Telecommunication carrier, ISP. Hong Kong SAR, China.",
+  "162.219.85.5": "AS10099 China Unicom Global IP Servcies IRT-UNICOM-HK",
+  "210.78.30.158": "UNICOM-CN China Unicom IP network China Unicom service provider"
+ }
+}

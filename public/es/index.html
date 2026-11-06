@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="es" data-paths="{&quot;en&quot;:&quot;/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/&quot;,&quot;zh-TW&quot;:&quot;/zh-tw/&quot;,&quot;ja&quot;:&quot;/ja/&quot;,&quot;ko&quot;:&quot;/ko/&quot;,&quot;es&quot;:&quot;/es/&quot;,&quot;fr&quot;:&quot;/fr/&quot;,&quot;de&quot;:&quot;/de/&quot;,&quot;pt&quot;:&quot;/pt/&quot;,&quot;ru&quot;:&quot;/ru/&quot;}">
+<head>
+<meta charset="utf-8">
+<script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("route-trace:theme");s=localStorage.getItem("route-trace:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en"&&P[l]&&!/\/r\//.test(location.pathname))location.replace(P[l]+location.search+location.hash)})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Traza de ruta: traceroute online desde una red como la tuya, con mapa · 1ms.dog</title>
+<meta name="description" content="Traza la ruta hasta cualquier web o servidor desde una sonda en tu propia red: cada salto, las redes y líneas que cruza, dónde sale del país, qué tramo da un rodeo y dónde se pierden paquetes. Ida y vuelta, dibujadas en un mapa. Sin instalar nada.">
+<meta name="keywords" content="traceroute online, mtr online, trazar ruta, ruta de red, ruta de vuelta, latencia por salto, mapa traceroute">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="application-name" content="Traza de ruta">
+<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://trace.1ms.dog/es/">
+<link rel="alternate" hreflang="en" href="https://trace.1ms.dog/">
+<link rel="alternate" hreflang="zh-CN" href="https://trace.1ms.dog/zh-cn/">
+<link rel="alternate" hreflang="zh-TW" href="https://trace.1ms.dog/zh-tw/">
+<link rel="alternate" hreflang="ja" href="https://trace.1ms.dog/ja/">
+<link rel="alternate" hreflang="ko" href="https://trace.1ms.dog/ko/">
+<link rel="alternate" hreflang="es" href="https://trace.1ms.dog/es/">
+<link rel="alternate" hreflang="fr" href="https://trace.1ms.dog/fr/">
+<link rel="alternate" hreflang="de" href="https://trace.1ms.dog/de/">
+<link rel="alternate" hreflang="pt" href="https://trace.1ms.dog/pt/">
+<link rel="alternate" hreflang="ru" href="https://trace.1ms.dog/ru/">
+<link rel="alternate" hreflang="x-default" href="https://trace.1ms.dog/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="1ms.dog">
+<meta property="og:title" content="Traza de ruta: traceroute online desde una red como la tuya, con mapa · 1ms.dog">
+<meta property="og:description" content="Cada salto, en los dos sentidos: qué redes, dónde cruza fronteras, qué tramo va lento">
+<meta property="og:url" content="https://trace.1ms.dog/es/">
+<meta property="og:locale" content="es_ES">
+<meta property="og:image" content="https://trace.1ms.dog/og/es.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Traza de ruta: traceroute online desde una red como la tuya, con mapa · 1ms.dog">
+<meta name="twitter:description" content="Cada salto, en los dos sentidos: qué redes, dónde cruza fronteras, qué tramo va lento">
+<meta name="twitter:image" content="https://trace.1ms.dog/og/es.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"Traza de ruta · 1ms.dog","url":"https://trace.1ms.dog/es/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"Traza la ruta hasta cualquier web o servidor desde una sonda en tu propia red: cada salto, las redes y líneas que cruza, dónde sale del país, qué tramo da un rodeo y dónde se pierden paquetes. Ida y vuelta, dibujadas en un mapa. Sin instalar nada.","inLanguage":"es","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿De quién es la red que se traza?","acceptedAnswer":{"@type":"Answer","text":"Globalping tiene miles de sondas en líneas domésticas y centros de datos de todo el mundo. La ida parte de una sonda de tu mismo operador, en tu ciudad si es posible, y muestra cómo una red como la tuya llega al destino. La vuelta parte de una sonda cerca del destino y traza el camino hasta tu IP. La red local de la sonda no se cuenta."}},{"@type":"Question","name":"¿Por qué la sonda sugerida no está en mi ciudad?","acceptedAnswer":{"@type":"Answer","text":"Muchas ciudades no tienen ninguna sonda de tu operador. Los operadores se diferencian mucho más que las ciudades (cada uno tiene su red troncal y sus enlaces internacionales), así que el mismo operador en otra ciudad va por delante de otro operador en la tuya. Toca la sonda para elegir otra."}},{"@type":"Question","name":"¿Qué significa una ciudad con interrogación?","acceptedAnswer":{"@type":"Answer","text":"Algunas direcciones de redes troncales no se anuncian en la tabla de rutas, así que una base de datos solo sabe dónde está registrado el bloque (las de China Unicom Global, por ejemplo, en Hong Kong). Esos lugares llevan un interrogante y una línea discontinua en el mapa, y se omiten cuando la latencia con los saltos de alrededor los descarta (la luz en fibra recorre unos 100 km por milisegundo de ida y vuelta)."}},{"@type":"Question","name":"¿A dónde van las peticiones?","acceptedAnswer":{"@type":"Answer","text":"Directamente desde tu navegador, nunca a través de un servidor de 1ms.dog: a Globalping (las sondas y la traza; recibe el destino, y tu IP en una traza de vuelta, y guarda los resultados accesibles por su ID), a ipip.net, Cloudflare, ip.sb, ipinfo y GeoJS (tus IP de salida y dónde está cada salto), a PeeringDB (puntos de intercambio), a RDAP (quién registró una dirección) y a servidores STUN públicos."}},{"@type":"Question","name":"¿Por qué un salto muestra pérdida si la ruta no la tiene?","acceptedAnswer":{"@type":"Answer","text":"Los routers responden a las sondas en último lugar y a menudo no responden. Si un salto deja respuestas sin dar pero todos los siguientes van bien, ese router solo estaba ocupado; solo cuenta la pérdida que dura hasta el final de la ruta."}},{"@type":"Question","name":"¿Cómo se cuenta la cuota?","acceptedAnswer":{"@type":"Answer","text":"Globalping cuenta por la IP que le llega: 250 trazas por hora, una por traza. Detrás de un proxy cuenta la salida del proxy, compartida por todos los que la usan."}}]}]}</script>
+<link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/app.90d7ce38c5.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a class="brand" href="/es/" aria-current="page">
+      <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms" loading="lazy"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms" loading="lazy"></span>
+      <span class="brand-name" data-i="app_name">Traza de ruta</span>
+    </a>
+    <div class="top-acts">
+      <label class="sel"><span class="sr" data-i="lang_label">Idioma</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.8 4 2.8 6.5S10 12.5 8 14.5C6 12.5 5.2 10.5 5.2 8S6 3.5 8 1.5z"/></svg>
+        <select id="lang"><option value="en">English</option><option value="zh-CN">简体中文</option><option value="zh-TW">繁體中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="es" selected>Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt">Português</option><option value="ru">Русский</option></select>
+      </label>
+      <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">Ayuda</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
+      </button>
+      <a class="icon-btn gh" href="https://github.com/yt1988/route-trace" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg></a>
+      <button class="icon-btn" id="theme" type="button" aria-label="Cambiar tema">
+        <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
+        <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
+        <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="sr">Traza de ruta: cómo llega tu red a cualquier sitio</h1>
+    <!-- 1. one card: the map and the bar that drives it -->
+    <section class="card hero" aria-label="Traza de ruta">
+      <div class="stage">
+        <div id="globe" class="globe"></div>
+      </div>
+      <div class="bar">
+        <div class="route">
+          <div class="end from">
+            <div class="end-k">
+              <span class="dir" role="tablist" aria-label="Sentido">
+                <button type="button" role="tab" data-dir="out" aria-selected="true" data-i="dir_out">Ida</button><button type="button" role="tab" data-dir="back" aria-selected="false" data-i="dir_back">Vuelta</button>
+              </span>
+            </div>
+            <button type="button" id="originBtn" class="origin" aria-haspopup="dialog"><span class="m" data-i="me_detecting">Buscando tu red…</span></button>
+          </div>
+          <div class="end to">
+            <div class="end-k" id="toK" data-i="to_label">Hasta</div>
+            <div class="to-box">
+              <input id="target" autocomplete="off" spellcheck="false" placeholder="Dominio o IP, p. ej. x.com" aria-label="Destino">
+              <div id="meTarget" class="me-target" hidden></div>
+            </div>
+          </div>
+          <div class="end go-col">
+            <button type="button" id="go" class="go" disabled data-i="go">Trazar</button>
+          </div>
+        </div>
+        <div class="bar-foot">
+          <div id="exits" class="exits m"></div>
+          <button type="button" class="opts-btn" id="optsBtn" aria-expanded="false" aria-controls="opts"><span data-i="opts">Opciones</span><span class="opts-cur" id="optsCur"></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>
+          <span class="quota m" id="quota"></span>
+        </div>
+        <div class="opts" id="opts" hidden>
+          <div class="opt"><span class="opt-k" data-i="opt_proto">Protocolo</span><div class="seg2" data-opt="proto" role="radiogroup" aria-label="Protocolo"><button type="button" data-v="ICMP" aria-pressed="true">ICMP</button><button type="button" data-v="TCP:443" aria-pressed="false">TCP 443</button><button type="button" data-v="TCP:80" aria-pressed="false">TCP 80</button><button type="button" data-v="UDP:33434" aria-pressed="false">UDP</button></div></div>
+          <div class="opt"><span class="opt-k" data-i="opt_packets">Paquetes por salto</span><div class="seg2" data-opt="packets" role="radiogroup" aria-label="Paquetes por salto"><button type="button" data-v="5" aria-pressed="false">5</button><button type="button" data-v="10" aria-pressed="true">10</button><button type="button" data-v="16" aria-pressed="false">16</button></div></div>
+          <div class="opt"><span class="opt-k" data-i="opt_ip">IP</span><div class="seg2" data-opt="ipv" role="radiogroup" aria-label="IP"><button type="button" data-v="" aria-pressed="true" data-i="opt_auto">Auto</button><button type="button" data-v="4" aria-pressed="false">IPv4</button><button type="button" data-v="6" aria-pressed="false">IPv6</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. the path, in order -->
+    <section id="result" class="card path" hidden aria-label="Ruta" aria-live="polite"></section>
+  </main>
+</div>
+
+<!-- questions behind the "?" button: the list on the left, one answer at a time (tool-contract §4) -->
+<dialog id="help" class="help" aria-label="Ayuda">
+  <div class="help-h"><b data-i="faq_h">Ayuda</b><button type="button" class="pk-close" id="helpClose" aria-label="Cerrar">✕</button></div>
+  <div class="help-sel"><select id="helpSel" aria-label="Pregunta"></select><button type="button" id="helpPrev" aria-label="Anterior">‹</button><button type="button" id="helpNext" aria-label="Siguiente">›</button></div>
+  <div class="help-b">
+    <nav class="help-nav" id="helpNav" role="tablist" aria-label="Pregunta"></nav>
+    <div class="help-a" id="helpA"><article><h3>¿De quién es la red que se traza?</h3><p>Globalping tiene miles de sondas en líneas domésticas y centros de datos de todo el mundo. La ida parte de una sonda de tu mismo operador, en tu ciudad si es posible, y muestra cómo una red como la tuya llega al destino. La vuelta parte de una sonda cerca del destino y traza el camino hasta tu IP. La red local de la sonda no se cuenta.</p></article><article hidden><h3>¿Por qué la sonda sugerida no está en mi ciudad?</h3><p>Muchas ciudades no tienen ninguna sonda de tu operador. Los operadores se diferencian mucho más que las ciudades (cada uno tiene su red troncal y sus enlaces internacionales), así que el mismo operador en otra ciudad va por delante de otro operador en la tuya. Toca la sonda para elegir otra.</p></article><article hidden><h3>¿Qué significa una ciudad con interrogación?</h3><p>Algunas direcciones de redes troncales no se anuncian en la tabla de rutas, así que una base de datos solo sabe dónde está registrado el bloque (las de China Unicom Global, por ejemplo, en Hong Kong). Esos lugares llevan un interrogante y una línea discontinua en el mapa, y se omiten cuando la latencia con los saltos de alrededor los descarta (la luz en fibra recorre unos 100 km por milisegundo de ida y vuelta).</p></article><article hidden><h3>¿A dónde van las peticiones?</h3><p>Directamente desde tu navegador, nunca a través de un servidor de 1ms.dog: a Globalping (las sondas y la traza; recibe el destino, y tu IP en una traza de vuelta, y guarda los resultados accesibles por su ID), a ipip.net, Cloudflare, ip.sb, ipinfo y GeoJS (tus IP de salida y dónde está cada salto), a PeeringDB (puntos de intercambio), a RDAP (quién registró una dirección) y a servidores STUN públicos.</p></article><article hidden><h3>¿Por qué un salto muestra pérdida si la ruta no la tiene?</h3><p>Los routers responden a las sondas en último lugar y a menudo no responden. Si un salto deja respuestas sin dar pero todos los siguientes van bien, ese router solo estaba ocupado; solo cuenta la pérdida que dura hasta el final de la ruta.</p></article><article hidden><h3>¿Cómo se cuenta la cuota?</h3><p>Globalping cuenta por la IP que le llega: 250 trazas por hora, una por traza. Detrás de un proxy cuenta la salida del proxy, compartida por todos los que la usan.</p></article></div>
+  </div>
+</dialog>
+
+<dialog id="picker" class="picker" aria-label="Elegir sonda">
+  <div class="pk-head">
+    <div class="pk-search">
+      <input id="pkQ" type="search" autocomplete="off" spellcheck="false" placeholder="Busca ciudad, red o AS… p. ej. Madrid movistar, AS3352, Tokyo aws">
+      <button type="button" class="pk-close" id="pkClose" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="pk-bar">
+      <div class="seg" id="pkRef" role="radiogroup" aria-label="Comparar con"></div>
+      <div class="seg" id="pkType" role="radiogroup" aria-label="Tipo de red">
+        <button type="button" data-v="" aria-pressed="true" data-i="pk_all">Todas</button>
+        <button type="button" data-v="e" aria-pressed="false" data-i="pk_eye">Residencial</button>
+        <button type="button" data-v="d" aria-pressed="false" data-i="pk_dc">Centro de datos</button>
+      </div>
+    </div>
+  </div>
+  <div class="pk-body">
+    <div class="pk-list" id="pkList" role="listbox" aria-label="Sondas"></div>
+    <div class="pk-map" id="pkMap"></div>
+  </div>
+  <div class="pk-foot m" id="pkFoot"></div>
+</dialog>
+
+<script src="/assets/vendor/d3.min.js"></script>
+<script src="/assets/vendor/topojson-client.min.js"></script>
+<script src="/assets/l.es.96d84ad4db.js"></script>
+<script src="/assets/app.512ef377c8.js"></script>
+</body>
+</html>

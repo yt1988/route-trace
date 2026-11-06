@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN" data-paths="{&quot;en&quot;:&quot;/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/&quot;,&quot;zh-TW&quot;:&quot;/zh-tw/&quot;,&quot;ja&quot;:&quot;/ja/&quot;,&quot;ko&quot;:&quot;/ko/&quot;,&quot;es&quot;:&quot;/es/&quot;,&quot;fr&quot;:&quot;/fr/&quot;,&quot;de&quot;:&quot;/de/&quot;,&quot;pt&quot;:&quot;/pt/&quot;,&quot;ru&quot;:&quot;/ru/&quot;}">
+<head>
+<meta charset="utf-8">
+<script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("route-trace:theme");s=localStorage.getItem("route-trace:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en"&&P[l]&&!/\/r\//.test(location.pathname))location.replace(P[l]+location.search+location.hash)})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>路由追踪：看你的网络到任何网站怎么走，在线 traceroute · 1ms.dog</title>
+<meta name="description" content="从和你同运营商的探针出发，逐跳看到任意网站或服务器的路径：经过哪些运营商和线路（CN2、9929、CMI、CUG），在哪出境，哪一段绕路，哪里丢包。去程回程都能测，路线画在地图上，免安装。">
+<meta name="keywords" content="路由追踪,在线 traceroute,在线 mtr,回程路由,去程路由,CN2 GIA 检测,9929 线路,线路检测,路由跟踪">
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+<meta name="applicable-device" content="pc,mobile">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="application-name" content="路由追踪">
+<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://trace.1ms.dog/zh-cn/">
+<link rel="alternate" hreflang="en" href="https://trace.1ms.dog/">
+<link rel="alternate" hreflang="zh-CN" href="https://trace.1ms.dog/zh-cn/">
+<link rel="alternate" hreflang="zh-TW" href="https://trace.1ms.dog/zh-tw/">
+<link rel="alternate" hreflang="ja" href="https://trace.1ms.dog/ja/">
+<link rel="alternate" hreflang="ko" href="https://trace.1ms.dog/ko/">
+<link rel="alternate" hreflang="es" href="https://trace.1ms.dog/es/">
+<link rel="alternate" hreflang="fr" href="https://trace.1ms.dog/fr/">
+<link rel="alternate" hreflang="de" href="https://trace.1ms.dog/de/">
+<link rel="alternate" hreflang="pt" href="https://trace.1ms.dog/pt/">
+<link rel="alternate" hreflang="ru" href="https://trace.1ms.dog/ru/">
+<link rel="alternate" hreflang="x-default" href="https://trace.1ms.dog/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="1ms.dog">
+<meta property="og:title" content="路由追踪：看你的网络到任何网站怎么走，在线 traceroute · 1ms.dog">
+<meta property="og:description" content="逐跳看清去程回程：经过哪些线路，在哪出境，哪段绕路">
+<meta property="og:url" content="https://trace.1ms.dog/zh-cn/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://trace.1ms.dog/og/zh-cn.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="路由追踪：看你的网络到任何网站怎么走，在线 traceroute · 1ms.dog">
+<meta name="twitter:description" content="逐跳看清去程回程：经过哪些线路，在哪出境，哪段绕路">
+<meta name="twitter:image" content="https://trace.1ms.dog/og/zh-cn.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"路由追踪 · 1ms.dog","url":"https://trace.1ms.dog/zh-cn/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"从和你同运营商的探针出发，逐跳看到任意网站或服务器的路径：经过哪些运营商和线路（CN2、9929、CMI、CUG），在哪出境，哪一段绕路，哪里丢包。去程回程都能测，路线画在地图上，免安装。","inLanguage":"zh-CN","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"测的是谁的网络？","acceptedAnswer":{"@type":"Answer","text":"Globalping 在全球有几千个探针，装在别人的家宽和机房里。去程从一个和你同运营商、尽量同城的探针出发，看你这类网络去目标怎么走；回程从目标附近的探针出发，追踪回你的 IP。探针自己的局域网不计入路径。"}},{"@type":"Question","name":"为什么自动选的探针不在我的城市？","acceptedAnswer":{"@type":"Answer","text":"Globalping 在很多城市没有和你同运营商的探针。运营商之间的线路差别比城市之间大得多，所以同运营商的外地探针排在同城的其他运营商前面。点探针可以自己换。"}},{"@type":"Question","name":"带问号的城市是什么意思？","acceptedAnswer":{"@type":"Answer","text":"有些骨干网地址在路由表里没人宣告，地理库只知道它登记在哪里，比如联通国际的地址都登记在香港。这种位置会标一个问号，用虚线画在地图上；如果它和前后两跳的延迟对不上（光在光纤里每毫秒往返约 100 公里），就不画。"}},{"@type":"Question","name":"请求发到了哪里？","acceptedAnswer":{"@type":"Answer","text":"全部从你的浏览器直接发出，不经过 1ms.dog 的服务器：Globalping（探针和测量，目标和回程时你的 IP 会交给它，结果凭测量 ID 公开可查），ipip.net、Cloudflare、ip.sb、ipinfo、GeoJS（识别出口 IP 和定位每一跳），PeeringDB（交换中心），RDAP（地址的注册信息），以及公共 STUN 服务器。"}},{"@type":"Question","name":"为什么某一跳丢包很多，路径却算没丢包？","acceptedAnswer":{"@type":"Answer","text":"路由器回应探测包的优先级很低，常常不回。某一跳丢包、后面的跳都正常，就只是它没空回，不是真丢包；一直延续到终点的丢包才算。"}},{"@type":"Question","name":"额度是怎么算的？","acceptedAnswer":{"@type":"Answer","text":"Globalping 按访问它的 IP 计算，每小时 250 次，每次追踪用 1 次。开着代理时按代理出口算，同一出口的人共用。"}}]}]}</script>
+<link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/app.90d7ce38c5.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a class="brand" href="/zh-cn/" aria-current="page">
+      <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms" loading="lazy"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms" loading="lazy"></span>
+      <span class="brand-name" data-i="app_name">路由追踪</span>
+    </a>
+    <div class="top-acts">
+      <label class="sel"><span class="sr" data-i="lang_label">语言</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.8 4 2.8 6.5S10 12.5 8 14.5C6 12.5 5.2 10.5 5.2 8S6 3.5 8 1.5z"/></svg>
+        <select id="lang"><option value="en">English</option><option value="zh-CN" selected>简体中文</option><option value="zh-TW">繁體中文</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt">Português</option><option value="ru">Русский</option></select>
+      </label>
+      <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">问答</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
+      </button>
+      <a class="icon-btn gh" href="https://github.com/yt1988/route-trace" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg></a>
+      <button class="icon-btn" id="theme" type="button" aria-label="切换主题">
+        <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
+        <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
+        <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="sr">路由追踪：你的网络到任何地方怎么走</h1>
+    <!-- 1. one card: the map and the bar that drives it -->
+    <section class="card hero" aria-label="路由追踪">
+      <div class="stage">
+        <div id="globe" class="globe"></div>
+      </div>
+      <div class="bar">
+        <div class="route">
+          <div class="end from">
+            <div class="end-k">
+              <span class="dir" role="tablist" aria-label="方向">
+                <button type="button" role="tab" data-dir="out" aria-selected="true" data-i="dir_out">去程</button><button type="button" role="tab" data-dir="back" aria-selected="false" data-i="dir_back">回程</button>
+              </span>
+            </div>
+            <button type="button" id="originBtn" class="origin" aria-haspopup="dialog"><span class="m" data-i="me_detecting">正在识别你的网络…</span></button>
+          </div>
+          <div class="end to">
+            <div class="end-k" id="toK" data-i="to_label">到</div>
+            <div class="to-box">
+              <input id="target" autocomplete="off" spellcheck="false" placeholder="域名或 IP，例如 x.com" aria-label="目标">
+              <div id="meTarget" class="me-target" hidden></div>
+            </div>
+          </div>
+          <div class="end go-col">
+            <button type="button" id="go" class="go" disabled data-i="go">开始追踪</button>
+          </div>
+        </div>
+        <div class="bar-foot">
+          <div id="exits" class="exits m"></div>
+          <button type="button" class="opts-btn" id="optsBtn" aria-expanded="false" aria-controls="opts"><span data-i="opts">选项</span><span class="opts-cur" id="optsCur"></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>
+          <span class="quota m" id="quota"></span>
+        </div>
+        <div class="opts" id="opts" hidden>
+          <div class="opt"><span class="opt-k" data-i="opt_proto">协议</span><div class="seg2" data-opt="proto" role="radiogroup" aria-label="协议"><button type="button" data-v="ICMP" aria-pressed="true">ICMP</button><button type="button" data-v="TCP:443" aria-pressed="false">TCP 443</button><button type="button" data-v="TCP:80" aria-pressed="false">TCP 80</button><button type="button" data-v="UDP:33434" aria-pressed="false">UDP</button></div></div>
+          <div class="opt"><span class="opt-k" data-i="opt_packets">每跳包数</span><div class="seg2" data-opt="packets" role="radiogroup" aria-label="每跳包数"><button type="button" data-v="5" aria-pressed="false">5</button><button type="button" data-v="10" aria-pressed="true">10</button><button type="button" data-v="16" aria-pressed="false">16</button></div></div>
+          <div class="opt"><span class="opt-k" data-i="opt_ip">IP</span><div class="seg2" data-opt="ipv" role="radiogroup" aria-label="IP"><button type="button" data-v="" aria-pressed="true" data-i="opt_auto">自动</button><button type="button" data-v="4" aria-pressed="false">IPv4</button><button type="button" data-v="6" aria-pressed="false">IPv6</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. the path, in order -->
+    <section id="result" class="card path" hidden aria-label="路径" aria-live="polite"></section>
+  </main>
+</div>
+
+<!-- questions behind the "?" button: the list on the left, one answer at a time (tool-contract §4) -->
+<dialog id="help" class="help" aria-label="问答">
+  <div class="help-h"><b data-i="faq_h">问答</b><button type="button" class="pk-close" id="helpClose" aria-label="关闭">✕</button></div>
+  <div class="help-sel"><select id="helpSel" aria-label="问题"></select><button type="button" id="helpPrev" aria-label="上一条">‹</button><button type="button" id="helpNext" aria-label="下一条">›</button></div>
+  <div class="help-b">
+    <nav class="help-nav" id="helpNav" role="tablist" aria-label="问题"></nav>
+    <div class="help-a" id="helpA"><article><h3>测的是谁的网络？</h3><p>Globalping 在全球有几千个探针，装在别人的家宽和机房里。去程从一个和你同运营商、尽量同城的探针出发，看你这类网络去目标怎么走；回程从目标附近的探针出发，追踪回你的 IP。探针自己的局域网不计入路径。</p></article><article hidden><h3>为什么自动选的探针不在我的城市？</h3><p>Globalping 在很多城市没有和你同运营商的探针。运营商之间的线路差别比城市之间大得多，所以同运营商的外地探针排在同城的其他运营商前面。点探针可以自己换。</p></article><article hidden><h3>带问号的城市是什么意思？</h3><p>有些骨干网地址在路由表里没人宣告，地理库只知道它登记在哪里，比如联通国际的地址都登记在香港。这种位置会标一个问号，用虚线画在地图上；如果它和前后两跳的延迟对不上（光在光纤里每毫秒往返约 100 公里），就不画。</p></article><article hidden><h3>请求发到了哪里？</h3><p>全部从你的浏览器直接发出，不经过 1ms.dog 的服务器：Globalping（探针和测量，目标和回程时你的 IP 会交给它，结果凭测量 ID 公开可查），ipip.net、Cloudflare、ip.sb、ipinfo、GeoJS（识别出口 IP 和定位每一跳），PeeringDB（交换中心），RDAP（地址的注册信息），以及公共 STUN 服务器。</p></article><article hidden><h3>为什么某一跳丢包很多，路径却算没丢包？</h3><p>路由器回应探测包的优先级很低，常常不回。某一跳丢包、后面的跳都正常，就只是它没空回，不是真丢包；一直延续到终点的丢包才算。</p></article><article hidden><h3>额度是怎么算的？</h3><p>Globalping 按访问它的 IP 计算，每小时 250 次，每次追踪用 1 次。开着代理时按代理出口算，同一出口的人共用。</p></article></div>
+  </div>
+</dialog>
+
+<dialog id="picker" class="picker" aria-label="选择探针">
+  <div class="pk-head">
+    <div class="pk-search">
+      <input id="pkQ" type="search" autocomplete="off" spellcheck="false" placeholder="搜城市、运营商、AS 号… 例：上海 电信、AS4837、东京 aws">
+      <button type="button" class="pk-close" id="pkClose" aria-label="关闭">✕</button>
+    </div>
+    <div class="pk-bar">
+      <div class="seg" id="pkRef" role="radiogroup" aria-label="和谁比较"></div>
+      <div class="seg" id="pkType" role="radiogroup" aria-label="网络类型">
+        <button type="button" data-v="" aria-pressed="true" data-i="pk_all">全部</button>
+        <button type="button" data-v="e" aria-pressed="false" data-i="pk_eye">家宽</button>
+        <button type="button" data-v="d" aria-pressed="false" data-i="pk_dc">机房</button>
+      </div>
+    </div>
+  </div>
+  <div class="pk-body">
+    <div class="pk-list" id="pkList" role="listbox" aria-label="探针"></div>
+    <div class="pk-map" id="pkMap"></div>
+  </div>
+  <div class="pk-foot m" id="pkFoot"></div>
+</dialog>
+
+<script src="/assets/vendor/d3.min.js"></script>
+<script src="/assets/vendor/topojson-client.min.js"></script>
+<script src="/assets/l.zh-cn.faf964033f.js"></script>
+<script src="/assets/app.512ef377c8.js"></script>
+</body>
+</html>

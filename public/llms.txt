@@ -1,0 +1,14 @@
+# Route Trace · 1ms.dog
+
+> Free online traceroute (MTR) with a map, run from the visitor's browser straight to Globalping's public probes.
+> Outbound: from a probe that looks like the visitor's own network (same AS, else same carrier, else nearby; the
+> visitor's networks are found the way the 1ms.dog home page finds exits). Return: from a probe next to the target,
+> back to the visitor's IP. Each hop's latency is the lowest later round trip (routers answer probes late), loss only
+> counts when it lasts to the end, the probe's LAN is left out. Hops are placed by PeeringDB (exchange points), router
+> names, then geo databases; a place that light in fibre can't reach in the measured time is dropped, and an
+> unannounced backbone address's database city is shown as a guess. Lines are named (CN2, 163, 169, 9929, CUG, CMI,
+> CMIN2, exchange points, the big transit and cloud networks). A trace can be shared as a link (/r/<code>) that holds
+> the hops and places; a return trace's link keeps only half of the visitor's IP unless they tick the box.
+
+- Page: https://trace.1ms.dog/ (also /zh-cn/, /zh-tw/, /ja/, /ko/, /es/, /fr/, /de/, /pt/, /ru/)
+- Source code: https://github.com/yt1988/route-trace

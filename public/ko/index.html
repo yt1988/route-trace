@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko" data-paths="{&quot;en&quot;:&quot;/&quot;,&quot;zh-CN&quot;:&quot;/zh-cn/&quot;,&quot;zh-TW&quot;:&quot;/zh-tw/&quot;,&quot;ja&quot;:&quot;/ja/&quot;,&quot;ko&quot;:&quot;/ko/&quot;,&quot;es&quot;:&quot;/es/&quot;,&quot;fr&quot;:&quot;/fr/&quot;,&quot;de&quot;:&quot;/de/&quot;,&quot;pt&quot;:&quot;/pt/&quot;,&quot;ru&quot;:&quot;/ru/&quot;}">
+<head>
+<meta charset="utf-8">
+<script>(function(){var d=document.documentElement,th=null,s=null;try{th=localStorage.getItem("route-trace:theme");s=localStorage.getItem("route-trace:lang")}catch(e){}if(th==="light"||th==="dark")d.setAttribute("data-theme",th);if(!d.hasAttribute("data-root"))return;var P=JSON.parse(d.getAttribute("data-paths")||"{}"),l=null;try{var q=new URLSearchParams(location.search).get("lang");if(P[q])l=q}catch(e){}if(!l&&P[s])l=s;for(var ls=navigator.languages||[navigator.language||"en"],i=0;!l&&!s&&i<ls.length;i++){var x=String(ls[i]).toLowerCase(),b=x.split("-")[0];l=b==="zh"?(/tw|hk|mo|hant/.test(x)?"zh-TW":"zh-CN"):P[b]?b:null}if(l&&l!=="en"&&P[l]&&!/\/r\//.test(location.pathname))location.replace(P[l]+location.search+location.hash)})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>경로 추적: 내 회선에서 어디로 어떻게 가는지 지도로, 온라인 traceroute · 1ms.dog</title>
+<meta name="description" content="나와 같은 통신사의 프로브에서 출발해, 원하는 사이트나 서버까지의 경로를 홉마다 보여 줍니다. 지나가는 네트워크와 회선, 국경을 넘는 곳, 돌아가는 구간, 패킷 손실이 시작되는 곳을 알 수 있습니다. 가는 길과 돌아오는 길 모두, 지도와 함께. 설치 필요 없음.">
+<meta name="keywords" content="온라인 traceroute,온라인 mtr,경로 추적,라우팅 경로,회선 확인,홉별 지연,네트워크 경로">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="application-name" content="경로 추적">
+<meta name="theme-color" content="#f6f6f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1c1c1c" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://trace.1ms.dog/ko/">
+<link rel="alternate" hreflang="en" href="https://trace.1ms.dog/">
+<link rel="alternate" hreflang="zh-CN" href="https://trace.1ms.dog/zh-cn/">
+<link rel="alternate" hreflang="zh-TW" href="https://trace.1ms.dog/zh-tw/">
+<link rel="alternate" hreflang="ja" href="https://trace.1ms.dog/ja/">
+<link rel="alternate" hreflang="ko" href="https://trace.1ms.dog/ko/">
+<link rel="alternate" hreflang="es" href="https://trace.1ms.dog/es/">
+<link rel="alternate" hreflang="fr" href="https://trace.1ms.dog/fr/">
+<link rel="alternate" hreflang="de" href="https://trace.1ms.dog/de/">
+<link rel="alternate" hreflang="pt" href="https://trace.1ms.dog/pt/">
+<link rel="alternate" hreflang="ru" href="https://trace.1ms.dog/ru/">
+<link rel="alternate" hreflang="x-default" href="https://trace.1ms.dog/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="1ms.dog">
+<meta property="og:title" content="경로 추적: 내 회선에서 어디로 어떻게 가는지 지도로, 온라인 traceroute · 1ms.dog">
+<meta property="og:description" content="가는 길도 돌아오는 길도 홉마다: 어떤 회선을 지나고, 어디서 국경을 넘고, 어디가 느린지">
+<meta property="og:url" content="https://trace.1ms.dog/ko/">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:image" content="https://trace.1ms.dog/og/ko.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="경로 추적: 내 회선에서 어디로 어떻게 가는지 지도로, 온라인 traceroute · 1ms.dog">
+<meta name="twitter:description" content="가는 길도 돌아오는 길도 홉마다: 어떤 회선을 지나고, 어디서 국경을 넘고, 어디가 느린지">
+<meta name="twitter:image" content="https://trace.1ms.dog/og/ko.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"경로 추적 · 1ms.dog","url":"https://trace.1ms.dog/ko/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"나와 같은 통신사의 프로브에서 출발해, 원하는 사이트나 서버까지의 경로를 홉마다 보여 줍니다. 지나가는 네트워크와 회선, 국경을 넘는 곳, 돌아가는 구간, 패킷 손실이 시작되는 곳을 알 수 있습니다. 가는 길과 돌아오는 길 모두, 지도와 함께. 설치 필요 없음.","inLanguage":"ko","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"누구의 회선을 측정하나요?","acceptedAnswer":{"@type":"Answer","text":"Globalping은 전 세계 가정용 회선과 데이터센터에 수천 대의 프로브를 두고 있어요. 가는 길은 나와 같은 통신사, 가능하면 같은 도시의 프로브에서 출발해, 나와 비슷한 회선이 대상까지 어떻게 가는지 보여 줘요. 오는 길은 대상 근처의 프로브에서 출발해 내 IP까지 추적해요. 프로브 자체의 LAN은 경로에 넣지 않아요."}},{"@type":"Question","name":"추천 프로브가 왜 내 도시에 없나요?","acceptedAnswer":{"@type":"Answer","text":"많은 도시에 나와 같은 통신사의 프로브가 없어요. 통신사 사이의 차이(백본과 국제 회선)가 도시 사이의 차이보다 훨씬 커서, 같은 통신사의 다른 도시 프로브를 같은 도시의 다른 통신사보다 위에 둬요. 프로브를 눌러 직접 고를 수 있어요."}},{"@type":"Question","name":"도시 이름 뒤의 물음표는 무슨 뜻인가요?","acceptedAnswer":{"@type":"Answer","text":"일부 백본 주소는 라우팅 테이블에 올라가 있지 않아서, 데이터베이스는 등록된 곳만 알아요(예: 차이나유니콤 글로벌 주소는 홍콩에 등록). 이런 위치에는 물음표를 붙이고 지도에 점선으로 그려요. 앞뒤 홉과의 지연에 맞지 않으면(광섬유는 왕복 1밀리초에 약 100km) 그리지 않아요."}},{"@type":"Question","name":"요청은 어디로 가나요?","acceptedAnswer":{"@type":"Answer","text":"모두 내 브라우저에서 바로 보내고, 1ms.dog 서버를 거치지 않아요. 받는 곳은 Globalping(프로브와 측정. 대상과, 오는 길에서는 내 IP를 받고, 결과는 측정 ID로 공개돼요), ipip.net·Cloudflare·ip.sb·ipinfo·GeoJS(출구 IP와 홉 위치), PeeringDB(IX), RDAP(주소 등록 정보), 공개 STUN 서버예요."}},{"@type":"Question","name":"중간 홉에 손실이 있는데 경로는 왜 손실이 없나요?","acceptedAnswer":{"@type":"Answer","text":"라우터는 측정 패킷 응답을 뒤로 미루고 자주 응답하지 않아요. 한 홉의 응답이 빠져도 그 뒤 홉이 모두 정상이면, 그 라우터가 바빴을 뿐이에요. 끝까지 이어지는 손실만 진짜 손실이에요."}},{"@type":"Question","name":"한도는 어떻게 세나요?","acceptedAnswer":{"@type":"Answer","text":"Globalping은 접속한 IP마다 시간당 250번이고, 추적 한 번에 1번을 써요. 프록시를 쓰면 프록시 출구 기준이라 같은 출구를 쓰는 사람과 함께 써요."}}]}]}</script>
+<link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/app.90d7ce38c5.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <a class="brand" href="/ko/" aria-current="page">
+      <span class="logo"><img class="logo-light" src="/assets/logo-light.svg" width="90" height="36" alt="1ms" loading="lazy"><img class="logo-dark" src="/assets/logo-dark.svg" width="90" height="36" alt="1ms" loading="lazy"></span>
+      <span class="brand-name" data-i="app_name">경로 추적</span>
+    </a>
+    <div class="top-acts">
+      <label class="sel"><span class="sr" data-i="lang_label">언어</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.8 4 2.8 6.5S10 12.5 8 14.5C6 12.5 5.2 10.5 5.2 8S6 3.5 8 1.5z"/></svg>
+        <select id="lang"><option value="en">English</option><option value="zh-CN">简体中文</option><option value="zh-TW">繁體中文</option><option value="ja">日本語</option><option value="ko" selected>한국어</option><option value="es">Español</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="pt">Português</option><option value="ru">Русский</option></select>
+      </label>
+      <button class="icon-btn" id="helpBtn" type="button" aria-haspopup="dialog" aria-controls="help"><span class="sr" data-i="faq_h">도움말</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M6.3 6.2a1.8 1.8 0 1 1 2.5 1.7c-.5.2-.8.6-.8 1.1v.4M8 11.3v.1"/></svg>
+      </button>
+      <a class="icon-btn gh" href="https://github.com/yt1988/route-trace" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 .2a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.4.7 0-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.4 7.4 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.6 3.9.3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 .2z"/></svg></a>
+      <button class="icon-btn" id="theme" type="button" aria-label="테마 바꾸기">
+        <svg class="i-sys" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5M8 11.5V14"/></svg>
+        <svg class="i-light" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3"/><path d="M8 1v1.6M8 13.4V15M1 8h1.6M13.4 8H15M3 3l1.1 1.1M11.9 11.9 13 13M3 13l1.1-1.1M11.9 4.1 13 3"/></svg>
+        <svg class="i-dark" viewBox="0 0 16 16" aria-hidden="true"><path d="M13.5 9.8A5.8 5.8 0 0 1 6.2 2.5a5.8 5.8 0 1 0 7.3 7.3z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="sr">경로 추적: 내 회선은 어디로 어떻게 가는가</h1>
+    <!-- 1. one card: the map and the bar that drives it -->
+    <section class="card hero" aria-label="경로 추적">
+      <div class="stage">
+        <div id="globe" class="globe"></div>
+      </div>
+      <div class="bar">
+        <div class="route">
+          <div class="end from">
+            <div class="end-k">
+              <span class="dir" role="tablist" aria-label="방향">
+                <button type="button" role="tab" data-dir="out" aria-selected="true" data-i="dir_out">가는 길</button><button type="button" role="tab" data-dir="back" aria-selected="false" data-i="dir_back">오는 길</button>
+              </span>
+            </div>
+            <button type="button" id="originBtn" class="origin" aria-haspopup="dialog"><span class="m" data-i="me_detecting">회선을 확인하는 중…</span></button>
+          </div>
+          <div class="end to">
+            <div class="end-k" id="toK" data-i="to_label">대상</div>
+            <div class="to-box">
+              <input id="target" autocomplete="off" spellcheck="false" placeholder="도메인이나 IP (예: x.com)" aria-label="대상">
+              <div id="meTarget" class="me-target" hidden></div>
+            </div>
+          </div>
+          <div class="end go-col">
+            <button type="button" id="go" class="go" disabled data-i="go">추적 시작</button>
+          </div>
+        </div>
+        <div class="bar-foot">
+          <div id="exits" class="exits m"></div>
+          <button type="button" class="opts-btn" id="optsBtn" aria-expanded="false" aria-controls="opts"><span data-i="opts">옵션</span><span class="opts-cur" id="optsCur"></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></button>
+          <span class="quota m" id="quota"></span>
+        </div>
+        <div class="opts" id="opts" hidden>
+          <div class="opt"><span class="opt-k" data-i="opt_proto">프로토콜</span><div class="seg2" data-opt="proto" role="radiogroup" aria-label="프로토콜"><button type="button" data-v="ICMP" aria-pressed="true">ICMP</button><button type="button" data-v="TCP:443" aria-pressed="false">TCP 443</button><button type="button" data-v="TCP:80" aria-pressed="false">TCP 80</button><button type="button" data-v="UDP:33434" aria-pressed="false">UDP</button></div></div>
+          <div class="opt"><span class="opt-k" data-i="opt_packets">홉당 패킷</span><div class="seg2" data-opt="packets" role="radiogroup" aria-label="홉당 패킷"><button type="button" data-v="5" aria-pressed="false">5</button><button type="button" data-v="10" aria-pressed="true">10</button><button type="button" data-v="16" aria-pressed="false">16</button></div></div>
+          <div class="opt"><span class="opt-k" data-i="opt_ip">IP</span><div class="seg2" data-opt="ipv" role="radiogroup" aria-label="IP"><button type="button" data-v="" aria-pressed="true" data-i="opt_auto">자동</button><button type="button" data-v="4" aria-pressed="false">IPv4</button><button type="button" data-v="6" aria-pressed="false">IPv6</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. the path, in order -->
+    <section id="result" class="card path" hidden aria-label="경로" aria-live="polite"></section>
+  </main>
+</div>
+
+<!-- questions behind the "?" button: the list on the left, one answer at a time (tool-contract §4) -->
+<dialog id="help" class="help" aria-label="도움말">
+  <div class="help-h"><b data-i="faq_h">도움말</b><button type="button" class="pk-close" id="helpClose" aria-label="닫기">✕</button></div>
+  <div class="help-sel"><select id="helpSel" aria-label="질문"></select><button type="button" id="helpPrev" aria-label="이전">‹</button><button type="button" id="helpNext" aria-label="다음">›</button></div>
+  <div class="help-b">
+    <nav class="help-nav" id="helpNav" role="tablist" aria-label="질문"></nav>
+    <div class="help-a" id="helpA"><article><h3>누구의 회선을 측정하나요?</h3><p>Globalping은 전 세계 가정용 회선과 데이터센터에 수천 대의 프로브를 두고 있어요. 가는 길은 나와 같은 통신사, 가능하면 같은 도시의 프로브에서 출발해, 나와 비슷한 회선이 대상까지 어떻게 가는지 보여 줘요. 오는 길은 대상 근처의 프로브에서 출발해 내 IP까지 추적해요. 프로브 자체의 LAN은 경로에 넣지 않아요.</p></article><article hidden><h3>추천 프로브가 왜 내 도시에 없나요?</h3><p>많은 도시에 나와 같은 통신사의 프로브가 없어요. 통신사 사이의 차이(백본과 국제 회선)가 도시 사이의 차이보다 훨씬 커서, 같은 통신사의 다른 도시 프로브를 같은 도시의 다른 통신사보다 위에 둬요. 프로브를 눌러 직접 고를 수 있어요.</p></article><article hidden><h3>도시 이름 뒤의 물음표는 무슨 뜻인가요?</h3><p>일부 백본 주소는 라우팅 테이블에 올라가 있지 않아서, 데이터베이스는 등록된 곳만 알아요(예: 차이나유니콤 글로벌 주소는 홍콩에 등록). 이런 위치에는 물음표를 붙이고 지도에 점선으로 그려요. 앞뒤 홉과의 지연에 맞지 않으면(광섬유는 왕복 1밀리초에 약 100km) 그리지 않아요.</p></article><article hidden><h3>요청은 어디로 가나요?</h3><p>모두 내 브라우저에서 바로 보내고, 1ms.dog 서버를 거치지 않아요. 받는 곳은 Globalping(프로브와 측정. 대상과, 오는 길에서는 내 IP를 받고, 결과는 측정 ID로 공개돼요), ipip.net·Cloudflare·ip.sb·ipinfo·GeoJS(출구 IP와 홉 위치), PeeringDB(IX), RDAP(주소 등록 정보), 공개 STUN 서버예요.</p></article><article hidden><h3>중간 홉에 손실이 있는데 경로는 왜 손실이 없나요?</h3><p>라우터는 측정 패킷 응답을 뒤로 미루고 자주 응답하지 않아요. 한 홉의 응답이 빠져도 그 뒤 홉이 모두 정상이면, 그 라우터가 바빴을 뿐이에요. 끝까지 이어지는 손실만 진짜 손실이에요.</p></article><article hidden><h3>한도는 어떻게 세나요?</h3><p>Globalping은 접속한 IP마다 시간당 250번이고, 추적 한 번에 1번을 써요. 프록시를 쓰면 프록시 출구 기준이라 같은 출구를 쓰는 사람과 함께 써요.</p></article></div>
+  </div>
+</dialog>
+
+<dialog id="picker" class="picker" aria-label="프로브 선택">
+  <div class="pk-head">
+    <div class="pk-search">
+      <input id="pkQ" type="search" autocomplete="off" spellcheck="false" placeholder="도시·통신사·AS 번호로 검색… 예: Seoul kt, AS4766, 도쿄 aws">
+      <button type="button" class="pk-close" id="pkClose" aria-label="닫기">✕</button>
+    </div>
+    <div class="pk-bar">
+      <div class="seg" id="pkRef" role="radiogroup" aria-label="비교 기준"></div>
+      <div class="seg" id="pkType" role="radiogroup" aria-label="네트워크 종류">
+        <button type="button" data-v="" aria-pressed="true" data-i="pk_all">전체</button>
+        <button type="button" data-v="e" aria-pressed="false" data-i="pk_eye">가정용</button>
+        <button type="button" data-v="d" aria-pressed="false" data-i="pk_dc">데이터센터</button>
+      </div>
+    </div>
+  </div>
+  <div class="pk-body">
+    <div class="pk-list" id="pkList" role="listbox" aria-label="프로브"></div>
+    <div class="pk-map" id="pkMap"></div>
+  </div>
+  <div class="pk-foot m" id="pkFoot"></div>
+</dialog>
+
+<script src="/assets/vendor/d3.min.js"></script>
+<script src="/assets/vendor/topojson-client.min.js"></script>
+<script src="/assets/l.ko.eee32bd79e.js"></script>
+<script src="/assets/app.512ef377c8.js"></script>
+</body>
+</html>
