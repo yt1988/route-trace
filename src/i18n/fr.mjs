@@ -21,6 +21,9 @@ export default {
   a_q: 'Question',
   a_path: 'Route',
   a_ipv: 'Version d’IP',
+  ip_no4: 'Aucune adresse IPv4 trouvée pour vous',
+  ip_no6: 'Aucune adresse IPv6 trouvée pour vous',
+  ip_locked: 'La cible est une adresse IPv{v}',
 
   dir_out: 'Aller',
   dir_back: 'Retour',

@@ -320,3 +320,6 @@ main { display: flex; flex-direction: column; gap: 20px; }
 .tl-comet { position: absolute; left: calc(16px + var(--rail) / 2 - 5px); top: -5px; width: 10px; height: 10px; border-radius: 50%;
   background: var(--comet); box-shadow: 0 0 0 2px var(--comet-ring), 0 0 10px var(--ink); pointer-events: none; transition: opacity .3s; z-index: 1; }
 @media (prefers-reduced-motion: reduce) { .tl-comet { display: none; } }
+
+/* a choice that the target rules out (an IPv6 trace to an IPv4 address) */
+.seg2 button:disabled { opacity: .4; cursor: not-allowed; }

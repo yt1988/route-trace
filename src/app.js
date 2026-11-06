@@ -87,9 +87,33 @@ function optsLabel() {
 }
 $('#optsBtn').addEventListener('click', () => { const open = $('#opts').hidden; $('#opts').hidden = !open; $('#optsBtn').setAttribute('aria-expanded', open); });
 document.querySelectorAll('.seg2').forEach((g) => g.addEventListener('click', (e) => {
-  const b = e.target.closest('button'); if (!b) return;
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
   g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b)); optsLabel();
+  if (g.dataset.opt === 'ipv') { renderMeTarget(); syncGo(); }
 }));
+// The IP choice follows the target, so the two never disagree. Return: the target is you, and the choice says which of
+// your addresses (IPv4 or IPv6) to trace back to; "auto" has no meaning there. Outbound: a domain can resolve either
+// way, so all three apply; an IP address is one family already, and the choice is locked to it.
+const isV4 = (x) => /^\d+\.\d+\.\d+\.\d+$/.test(x || ''), isV6 = (x) => String(x || '').includes(':');
+function myIps() { const who = backWho(); return { v4: who?.ips?.find(isV4) || (isV4(who?.ip) ? who.ip : null), v6: who?.ips?.find(isV6) || null, who }; }
+function syncIp() {
+  const g = document.querySelector('.seg2[data-opt="ipv"]'), btn = (v) => g.querySelector(`[data-v="${v}"]`);
+  const set = (v) => g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x.dataset.v === v));
+  const allow = (v, ok, why) => { const b = btn(v); b.disabled = !ok; b.hidden = false; b.title = ok ? '' : why || ''; };
+  if (S.dir === 'back') {
+    const { v4, v6 } = myIps();
+    btn('').hidden = true;
+    allow('4', !!v4, t('ip_no4')); allow('6', !!v6, t('ip_no6'));
+    const cur = opt('ipv');
+    if (!cur || (cur === '4' && !v4) || (cur === '6' && !v6)) set(v4 ? '4' : v6 ? '6' : '4');
+  } else {
+    btn('').hidden = false;
+    const lit = isV4(S.target) ? '4' : isV6(S.target) ? '6' : null;
+    allow('', !lit, lit && t('ip_locked', { v: lit })); allow('4', !lit || lit === '4', t('ip_locked', { v: lit })); allow('6', !lit || lit === '6', t('ip_locked', { v: lit }));
+    if (lit) set(lit); else if (!opt('ipv') && !optBtn('ipv')) set('');
+  }
+  optsLabel();
+}
 
 // ---------- start ----------
 init();
@@ -159,12 +183,14 @@ function renderExits() {
   const eg = tool('egress');
   if (xs.length && eg) parts.push(`<a class="ext" href="${eg}${langDir()}" target="_blank" rel="noopener">${esc(t('to_egress'))}${EXT}</a>`);
   $('#exits').innerHTML = parts.join('') || (S.me.ready ? esc(t('me_none')) : `<span class="spin sm"></span>${esc(t('me_detecting'))}`);
-  renderMeTarget();
+  renderMeTarget(); syncIp();
 }
 function backWho() { return S.ref.startsWith('x') ? S.me.exits[+S.ref.slice(1)] || S.me.home : S.me.home; }
+// which of your addresses a return trace goes to: the IP choice's family
+function backTarget() { const { v4, v6, who } = myIps(); return (opt('ipv') === '6' ? v6 : v4) || v4 || v6 || who?.ip || null; }
 function renderMeTarget() {
-  const who = backWho();
-  $('#meTarget').innerHTML = who ? `<b>${esc(who.ip)}</b><span class="m">${esc(netName(who))}</span>` : `<span class="m">${esc(t('ip_none'))}</span>`;
+  const who = backWho(), ip = backTarget();
+  $('#meTarget').innerHTML = who && ip ? `<b>${esc(ip)}</b><span class="m">${esc(netName(who))}</span>` : `<span class="m">${esc(t('ip_none'))}</span>`;
 }
 
 // ---------- the map before a run: you, your exits and the chosen probe ----------
@@ -192,13 +218,14 @@ document.querySelectorAll('.dir [data-dir]').forEach((b) => b.addEventListener('
   elTarget.hidden = S.dir === 'back'; $('#meTarget').hidden = S.dir === 'out';
   S.ref = S.dir === 'out' ? 'home' : 'target';
   S.originAuto = true;
+  syncIp(); renderMeTarget();
   if (S.dir === 'back') {
     if (!S.target) { S.origin = null; $('#originBtn').innerHTML = `<span class="m">${esc(t('back_need'))}</span>`; syncGo(); return; }
     await locateTarget();
   }
   autoPick(); syncGo();
 }));
-elTarget.addEventListener('input', () => { S.target = elTarget.value.trim(); store.set('rt:target', S.target); S.targetGeo = null; syncGo(); });
+elTarget.addEventListener('input', () => { S.target = elTarget.value.trim(); store.set('rt:target', S.target); S.targetGeo = null; syncIp(); syncGo(); });
 elTarget.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !$('#go').disabled) run(); });
 $('#go').addEventListener('click', () => (S.running ? S.abort?.abort() : run()));
 function syncGo() {
@@ -348,7 +375,7 @@ function pathHead(dir, s, target, acts) {
 async function run(opts = {}) {
   if (S.running || !S.origin) return;
   const [protocol, port] = opt('proto').split(':');
-  const target = S.dir === 'out' ? S.target : backWho()?.ip;
+  const target = S.dir === 'out' ? S.target : backTarget();
   if (!target) return;
   let from = opts.reuse && S.last?.id && S.last.slotKey === S.origin.slot.key ? S.last.id : L.locationFor(S.origin.slot);
   S.running = true; S.abort = new AbortController(); syncGo();

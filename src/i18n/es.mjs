@@ -21,6 +21,9 @@ export default {
   a_q: 'Pregunta',
   a_path: 'Ruta',
   a_ipv: 'Versión de IP',
+  ip_no4: 'No se encontró ninguna IPv4 tuya',
+  ip_no6: 'No se encontró ninguna IPv6 tuya',
+  ip_locked: 'El destino es una dirección IPv{v}',
 
   dir_out: 'Ida',
   dir_back: 'Vuelta',

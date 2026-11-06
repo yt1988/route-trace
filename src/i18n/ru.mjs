@@ -21,6 +21,9 @@ export default {
   a_q: 'Вопрос',
   a_path: 'Маршрут',
   a_ipv: 'Версия IP',
+  ip_no4: 'Ваш IPv4-адрес не найден',
+  ip_no6: 'Ваш IPv6-адрес не найден',
+  ip_locked: 'Цель — адрес IPv{v}',
 
   dir_out: 'Туда',
   dir_back: 'Обратно',

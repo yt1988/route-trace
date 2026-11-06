@@ -40,7 +40,7 @@
 <meta name="twitter:image" content="https://trace.1ms.dog/og/zh-tw.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","name":"路由追蹤 · 1ms.dog","url":"https://trace.1ms.dog/zh-tw/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","browserRequirements":"Requires JavaScript","description":"從和你同一家電信業者的探針出發，逐跳看到任意網站或伺服器的路徑：經過哪些網路和線路（CN2、9929、CMI、CUG），在哪裡出境，哪一段繞路，哪裡掉包。去程回程都能測，路線畫在地圖上，免安裝。","inLanguage":"zh-TW","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"測的是誰的網路？","acceptedAnswer":{"@type":"Answer","text":"Globalping 在全球有幾千個探針，裝在別人的家用網路和機房裡。去程從一個和你同業者、盡量同城的探針出發，看你這類網路去目標怎麼走；回程從目標附近的探針出發，追蹤回你的 IP。探針自己的區域網路不計入路徑。"}},{"@type":"Question","name":"為什麼自動選的探針不在我的城市？","acceptedAnswer":{"@type":"Answer","text":"Globalping 在很多城市沒有和你同業者的探針。業者之間的線路差別比城市之間大得多，所以同業者的外地探針排在同城的其他業者前面。點探針可以自己換。"}},{"@type":"Question","name":"帶問號的城市是什麼意思？","acceptedAnswer":{"@type":"Answer","text":"有些骨幹網位址在路由表裡沒人宣告，地理資料庫只知道它登記在哪裡，例如中國聯通國際的位址都登記在香港。這種位置會加一個問號，用虛線畫在地圖上；如果它和前後兩跳的延遲對不上（光在光纖裡每毫秒往返約 100 公里），就不畫。"}},{"@type":"Question","name":"請求送到了哪裡？","acceptedAnswer":{"@type":"Answer","text":"全部從你的瀏覽器直接送出，不經過 1ms.dog 的伺服器：Globalping（探針和測量，目標和回程時你的 IP 會交給它，結果憑測量 ID 公開可查），ipip.net、Cloudflare、ip.sb、ipinfo、GeoJS（辨識出口 IP 和定位每一跳），PeeringDB（交換中心），RDAP（位址的登記資訊），以及公共 STUN 伺服器。"}},{"@type":"Question","name":"為什麼某一跳掉包很多，路徑卻算沒掉包？","acceptedAnswer":{"@type":"Answer","text":"路由器回應探測封包的優先順序很低，常常不回。某一跳掉包、後面的跳都正常，就只是它沒空回，不是真的掉包；一直延續到終點的掉包才算。"}},{"@type":"Question","name":"額度怎麼算？","acceptedAnswer":{"@type":"Answer","text":"Globalping 依連到它的 IP 計算，每小時 250 次，每次追蹤用 1 次。開著代理時依代理出口計算，同一個出口的人共用。"}}]}]}</script>
 <link rel="preload" href="/assets/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/app.90d7ce38c5.css">
+<link rel="stylesheet" href="/assets/app.91e3d1fee9.css">
 </head>
 <body>
 <div class="app">
@@ -148,7 +148,7 @@
 
 <script src="/assets/vendor/d3.min.js"></script>
 <script src="/assets/vendor/topojson-client.min.js"></script>
-<script src="/assets/l.zh-tw.31acea9a1d.js"></script>
-<script src="/assets/app.512ef377c8.js"></script>
+<script src="/assets/l.zh-tw.a29559d609.js"></script>
+<script src="/assets/app.d3498e14fb.js"></script>
 </body>
 </html>

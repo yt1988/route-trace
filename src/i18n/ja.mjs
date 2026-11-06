@@ -21,6 +21,9 @@ export default {
   a_q: '質問',
   a_path: '経路',
   a_ipv: 'IP バージョン',
+  ip_no4: 'あなたの IPv4 アドレスが見つかりません',
+  ip_no6: 'あなたの IPv6 アドレスが見つかりません',
+  ip_locked: '宛先は IPv{v} アドレスです',
 
   dir_out: '往路',
   dir_back: '復路',

@@ -21,6 +21,9 @@ export default {
   a_q: '질문',
   a_path: '경로',
   a_ipv: 'IP 버전',
+  ip_no4: '내 IPv4 주소를 찾지 못했어요',
+  ip_no6: '내 IPv6 주소를 찾지 못했어요',
+  ip_locked: '대상이 IPv{v} 주소예요',
 
   dir_out: '가는 길',
   dir_back: '오는 길',

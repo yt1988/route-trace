@@ -21,6 +21,9 @@ export default {
   a_q: '問題',
   a_path: '路徑',
   a_ipv: 'IP 版本',
+  ip_no4: '沒偵測到你的 IPv4 位址',
+  ip_no6: '沒偵測到你的 IPv6 位址',
+  ip_locked: '目標是 IPv{v} 位址',
 
   dir_out: '去程',
   dir_back: '回程',
