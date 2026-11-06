@@ -39,6 +39,9 @@ export function createMap(el, { onStop, onCity, labels = { in: '+', out: '−', 
   }
   function project(pts, legs = [], pad = [34, 40, 24, 40]) {
     const [w, h] = size(); svg.attr('viewBox', `0 0 ${w} ${h}`);
+    // the view never leaves the fitted frame: zoomed all the way out it is the whole route again, wherever it was
+    // dragged, and zoomed in it can't be dragged off the map
+    zoom.extent([[0, 0], [w, h]]).translateExtent([[0, 0], [w, h]]);
     const lon = pts.length ? circMeanLon(pts) : 105;
     projection = d3.geoNaturalEarth1().rotate([-lon, 0]);
     if (pts.length) {
