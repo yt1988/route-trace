@@ -20,6 +20,7 @@ export default {
   a_probes: '프로브',
   a_q: '질문',
   a_path: '경로',
+  a_ipv: 'IP 버전',
 
   dir_out: '가는 길',
   dir_back: '오는 길',

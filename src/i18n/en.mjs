@@ -20,6 +20,7 @@ export default {
   a_probes: 'Probes',
   a_q: 'Question',
   a_path: 'Path',
+  a_ipv: 'IP version',
 
   dir_out: 'Outbound',
   dir_back: 'Return',

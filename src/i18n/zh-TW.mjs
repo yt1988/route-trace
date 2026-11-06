@@ -20,6 +20,7 @@ export default {
   a_probes: '探針',
   a_q: '問題',
   a_path: '路徑',
+  a_ipv: 'IP 版本',
 
   dir_out: '去程',
   dir_back: '回程',

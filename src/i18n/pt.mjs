@@ -20,6 +20,7 @@ export default {
   a_probes: 'Sondas',
   a_q: 'Pergunta',
   a_path: 'Rota',
+  a_ipv: 'Versão de IP',
 
   dir_out: 'Ida',
   dir_back: 'Volta',

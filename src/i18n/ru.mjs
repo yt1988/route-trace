@@ -20,6 +20,7 @@ export default {
   a_probes: 'Зонды',
   a_q: 'Вопрос',
   a_path: 'Маршрут',
+  a_ipv: 'Версия IP',
 
   dir_out: 'Туда',
   dir_back: 'Обратно',

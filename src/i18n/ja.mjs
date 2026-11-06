@@ -20,6 +20,7 @@ export default {
   a_probes: 'プローブ',
   a_q: '質問',
   a_path: '経路',
+  a_ipv: 'IP バージョン',
 
   dir_out: '往路',
   dir_back: '復路',

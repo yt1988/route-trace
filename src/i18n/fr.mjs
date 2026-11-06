@@ -20,6 +20,7 @@ export default {
   a_probes: 'Sondes',
   a_q: 'Question',
   a_path: 'Route',
+  a_ipv: 'Version d’IP',
 
   dir_out: 'Aller',
   dir_back: 'Retour',
