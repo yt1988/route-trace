@@ -25,7 +25,7 @@ Every request goes from your browser straight to public services; nothing passes
 | Step | Source |
 |---|---|
 | Your networks (home line and proxy exits) | the checks the 1ms.dog home page uses: `/_ms/me`, ipip.net, Cloudflare, ip.sb, ipinfo, IPv4-only and IPv6-only hosts, STUN; grouped by AS, data-centre networks marked as proxies |
-| The probe | Globalping's probe list. Outbound: same AS, else the same carrier (mainland carriers by family), else nearby. Return: closest to where the outbound trace ended |
+| The probe | Globalping's probe list. Outbound: same AS, else the same carrier (mainland carriers by family), else nearby. Return: closest to where the outbound trace ended, or one you pick |
 | The trace | Globalping MTR, one probe, 5–16 packets per hop |
 | Where each hop is | PeeringDB (exchange points), router names (IATA and CLLI codes), GeoJS, then ipinfo for country-only answers |
 | Who owns an unannounced address | RDAP |
@@ -47,8 +47,9 @@ Every request goes from your browser straight to public services; nothing passes
   CMIN2; exchange points; the big transit and cloud networks.
 
 A trace can be shared as a link, `/<lang>/r/<code>`, that holds the hops and their places (`src/code.mjs`), so it
-opens the same after Globalping's result has expired. On a return trace the target is your own IP: the link and the
-card keep only its first half unless you tick the box in the share dialog.
+opens the same after Globalping's result has expired. On a return trace the target is usually your own address (the field offers the ones detected, and takes any IP
+or domain): the link and the card keep only its first half, or drop a domain's first label, unless you tick the box
+in the share dialog.
 
 ## Develop
 
