@@ -42,6 +42,9 @@ const S = {
   last: null, running: false, abort: null,
 };
 const elTarget = $('#target'); elTarget.value = S.target;
+// ?t=<host or IP> fills the target (other tools link here this way, like reach's ?t=); it only fills the field, the
+// visitor still starts the trace, since the target goes to Globalping. It replaces the one remembered from last time.
+{ const q = (new URLSearchParams(location.search).get('t') || '').trim().slice(0, 253); if (/^[a-z0-9.:-]+$/i.test(q)) { S.target = q; elTarget.value = q; store.set('rt:target', q); } }
 const globe = createMap($('#globe'), { labels: MAPL(), onStop: (id, on) => litStop(id, on) });
 
 // ---------- header: theme, language, help (the same controls, in the same order, as every 1ms.dog tool) ----------
