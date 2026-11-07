@@ -7,6 +7,8 @@ export default {
   seo_kw: 'traceroute en ligne, mtr en ligne, tracer une route, chemin réseau, route retour, latence par saut, carte traceroute',
   og_sub: 'Chaque saut, dans les deux sens : quels réseaux, où la route passe la frontière, quel tronçon est lent',
   h1: 'Traceroute : comment votre réseau atteint n’importe où',
+  hero_h: 'Comment votre réseau atteint n’importe quel site',
+  lead: 'Chaque saut, aller et retour : quels réseaux il traverse, où il quitte le pays, quel tronçon fait un détour.',
   faq_h: 'Aide',
   a_theme: 'Changer de thème',
   a_close: 'Fermer',

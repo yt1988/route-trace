@@ -7,6 +7,8 @@ export default {
   seo_kw: 'traceroute online, mtr online, trazar ruta, ruta de red, ruta de vuelta, latencia por salto, mapa traceroute',
   og_sub: 'Cada salto, en los dos sentidos: qué redes, dónde cruza fronteras, qué tramo va lento',
   h1: 'Traza de ruta: cómo llega tu red a cualquier sitio',
+  hero_h: 'Cómo llega tu red a cualquier sitio',
+  lead: 'Cada salto, ida y vuelta: qué redes cruza, dónde sale del país y qué tramo da un rodeo.',
   faq_h: 'Ayuda',
   a_theme: 'Cambiar tema',
   a_close: 'Cerrar',

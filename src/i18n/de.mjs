@@ -7,6 +7,8 @@ export default {
   seo_kw: 'Traceroute online, MTR online, Route verfolgen, Netzwerkpfad, Rückroute, Latenz pro Hop, Traceroute Karte',
   og_sub: 'Jeder Hop, in beide Richtungen: welche Netze, wo die Grenze überquert wird, welcher Abschnitt langsam ist',
   h1: 'Routenverfolgung: wie dein Netz überallhin kommt',
+  hero_h: 'Wie dein Netz jede Website erreicht',
+  lead: 'Jeder Hop, hin und zurück: welche Netze er durchläuft, wo er das Land verlässt, welcher Abschnitt einen Umweg macht.',
   faq_h: 'Hilfe',
   a_theme: 'Design wechseln',
   a_close: 'Schließen',

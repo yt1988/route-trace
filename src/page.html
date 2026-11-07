@@ -33,7 +33,11 @@
   </header>
 
   <main>
-    <h1 class="sr">{{h1}}</h1>
+    <!-- what this is, in plain sight on the first screen (most visitors are on phones) -->
+    <div class="intro">
+      <h1>{{a:hero_h}}</h1>
+      <p class="lead">{{a:lead}}</p>
+    </div>
     <!-- 1. one card: the map and the bar that drives it -->
     <section class="card hero" aria-label="{{a:app_name}}">
       <div class="stage">

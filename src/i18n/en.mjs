@@ -7,6 +7,8 @@ export default {
   seo_kw: 'traceroute online, online mtr, route trace, return route, network path, traceroute map, latency by hop',
   og_sub: 'Every hop, both ways: which networks, where it crosses borders, which stretch is slow',
   h1: 'Route Trace: how your network reaches anywhere',
+  hero_h: 'How your network reaches any site',
+  lead: 'Every hop, both ways: which networks it crosses, where it leaves the country, which leg takes a detour.',
   faq_h: 'Help',
   a_theme: 'Switch theme',
   a_close: 'Close',

@@ -38,7 +38,7 @@ const cspOf = () => ["default-src 'self'", `script-src 'self' 'sha256-${sha(PREP
   "connect-src 'self' https:", "manifest-src 'self'", "object-src 'none'", "base-uri 'none'", "form-action 'none'", "frame-ancestors 'none'"].join('; ');
 
 // strings only the build uses (the page already shows them); everything else goes to the browser
-const BUILD_ONLY = new Set(['name', 'seo_title', 'seo_desc', 'seo_kw', 'og_sub', 'h1', 'docs', 'lang_label', 'faq_h']);
+const BUILD_ONLY = new Set(['name', 'seo_title', 'seo_desc', 'seo_kw', 'og_sub', 'h1', 'hero_h', 'lead', 'docs', 'lang_label', 'faq_h']);
 
 export async function build({ check = false } = {}) {
   const I = await loadI18n(), base = I['zh-CN'];
