@@ -66,6 +66,7 @@ export default {
   no_result: 'No result',
   open_fail: 'Couldn’t open this trace: {msg}. Globalping keeps results for a limited time.',
   link_bad: 'This result can’t be read; the link may be cut short.',
+  link_old: 'This browser is too old to open this shared link. Update it, or open the link in another browser.',
   quota_ok: '{left} traces left this hour; one trace uses 1',
   quota_out: 'The Globalping allowance is used up; it comes back in about {min} min (250 per IP per hour)',
   quota_tip: 'Counted by the IP you reach Globalping from; behind a proxy, everyone on the same exit shares it',

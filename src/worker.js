@@ -28,7 +28,7 @@ export default {
     const url = new URL(req.url);
     if (req.method !== 'GET' && req.method !== 'HEAD') return new Response('Method not allowed\n', { status: 405 });
     const sp = sharePath(url.pathname);
-    const o = sp && STR[sp.slug] && env.ASSETS ? await decodeResult(sp.code) : null;
+    const o = sp && STR[sp.slug] && env.ASSETS ? await decodeResult(sp.code).catch(() => null) : null;
     if (o) return shared(req, env, url, sp.slug, o);
     return new Response(req.method === 'HEAD' ? null : 'Not found\n', {
       status: 404,

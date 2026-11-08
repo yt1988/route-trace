@@ -66,6 +66,7 @@ export default {
   no_result: 'Sin resultado',
   open_fail: 'No se pudo abrir esta traza: {msg}. Globalping guarda los resultados durante un tiempo limitado.',
   link_bad: 'No se puede leer este resultado; puede que el enlace esté cortado.',
+  link_old: 'Este navegador es demasiado antiguo para abrir este enlace. Actualízalo o abre el enlace en otro navegador.',
   quota_ok: 'Te quedan {left} trazas esta hora; cada traza usa 1',
   quota_out: 'Se agotó la cuota de Globalping; vuelve en unos {min} min (250 por IP y hora)',
   quota_tip: 'Se cuenta por la IP con la que llegas a Globalping; detrás de un proxy, se comparte con todos los que usan la misma salida',

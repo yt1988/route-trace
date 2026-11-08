@@ -66,6 +66,7 @@ export default {
   no_result: 'Aucun résultat',
   open_fail: 'Impossible d’ouvrir ce tracé : {msg}. Globalping ne garde les résultats qu’un temps.',
   link_bad: 'Ce résultat est illisible ; le lien est peut-être tronqué.',
+  link_old: 'Ce navigateur est trop ancien pour ouvrir ce lien partagé. Mettez-le à jour, ou ouvrez le lien dans un autre navigateur.',
   quota_ok: 'Il vous reste {left} tracés pour cette heure ; un tracé en utilise 1',
   quota_out: 'Le quota Globalping est épuisé ; il revient dans environ {min} min (250 par IP et par heure)',
   quota_tip: 'Compté selon l’IP qui contacte Globalping ; derrière un proxy, il est partagé par tous ceux qui utilisent la même sortie',

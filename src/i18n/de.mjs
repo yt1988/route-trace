@@ -66,6 +66,7 @@ export default {
   no_result: 'Kein Ergebnis',
   open_fail: 'Diese Verfolgung lässt sich nicht öffnen: {msg}. Globalping hält Ergebnisse nur eine Zeit lang vor.',
   link_bad: 'Dieses Ergebnis lässt sich nicht lesen; der Link ist vielleicht abgeschnitten.',
+  link_old: 'Dieser Browser ist zu alt für diesen geteilten Link. Aktualisiere ihn oder öffne den Link in einem anderen Browser.',
   quota_ok: 'Diese Stunde noch {left} Verfolgungen übrig; eine braucht 1',
   quota_out: 'Das Globalping-Kontingent ist aufgebraucht; in etwa {min} Min. geht es wieder (250 pro IP und Stunde)',
   quota_tip: 'Gezählt nach der IP, mit der du Globalping erreichst; hinter einem Proxy teilen es sich alle mit demselben Ausgang',

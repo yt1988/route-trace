@@ -66,6 +66,7 @@ export default {
   no_result: '没有结果',
   open_fail: '打不开这次追踪：{msg}。Globalping 的结果只保留一段时间。',
   link_bad: '无法读取这条结果，链接可能不完整。',
+  link_old: '这个浏览器版本太旧，打不开这条分享链接。请更新浏览器，或换一个浏览器打开。',
   quota_ok: '本小时还能测 {left} 次，每次追踪用 1 次',
   quota_out: 'Globalping 的额度用完了，约 {min} 分钟后恢复（每个 IP 每小时 250 次）',
   quota_tip: '按你访问 Globalping 时的 IP 计算；走代理时，同一出口的人共用这份额度',

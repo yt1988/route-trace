@@ -66,6 +66,7 @@ export default {
   no_result: 'Sem resultado',
   open_fail: 'Não foi possível abrir este rastreio: {msg}. O Globalping guarda os resultados por um tempo limitado.',
   link_bad: 'Não dá para ler este resultado; o link pode estar cortado.',
+  link_old: 'Este navegador é antigo demais para abrir este link. Atualize-o ou abra o link em outro navegador.',
   quota_ok: 'Ainda restam {left} rastreios nesta hora; cada rastreio usa 1',
   quota_out: 'A cota do Globalping acabou; ela volta em cerca de {min} min (250 por IP por hora)',
   quota_tip: 'Contada pelo IP com que você chega ao Globalping; atrás de um proxy, é dividida por todos que usam a mesma saída',

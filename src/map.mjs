@@ -2,9 +2,22 @@
 // servers, so it works everywhere. Two modes: a route (stops and legs) and the probe picker (dots to click).
 /* global d3, topojson */
 
+// The world outline is the one big download (~100 KB). On a shaky mobile line it can fail ("Failed to fetch", "Load
+// failed"): it is tried three times, and a failure is forgotten so the next redraw asks again. Until it arrives the
+// map draws the route on the bare sphere instead of throwing.
 let worldP = null;
-const loadWorld = () => worldP || (worldP = fetch('/assets/vendor/countries-110m.json').then((r) => r.json())
-  .then((t) => ({ countries: topojson.feature(t, t.objects.countries), borders: topojson.mesh(t, t.objects.countries, (a, b) => a !== b) })));
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+async function fetchWorld() {
+  for (let i = 0; ; i++) {
+    try {
+      const r = await fetch('/assets/vendor/countries-110m.json');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const t = await r.json();
+      return { countries: topojson.feature(t, t.objects.countries), borders: topojson.mesh(t, t.objects.countries, (a, b) => a !== b) };
+    } catch (e) { if (i >= 2) throw e; await wait(1000 * (i + 1)); }
+  }
+}
+const loadWorld = () => worldP || (worldP = fetchWorld().catch(() => { worldP = null; return null; }));
 
 function circMeanLon(pts) {
   let x = 0, y = 0; for (const p of pts) { const r = p.lon * Math.PI / 180; x += Math.cos(r); y += Math.sin(r); }
@@ -62,6 +75,7 @@ export function createMap(el, { onStop, onCity, labels = { in: '+', out: '−', 
     world = world || await loadWorld();
     gLand.selectAll('*').remove();
     gLand.append('path').attr('class', 'sphere').attr('d', path({ type: 'Sphere' }));
+    if (!world) return;
     gLand.append('path').attr('class', 'country').attr('d', path(world.countries));
     gLand.append('path').attr('class', 'border').attr('d', path(world.borders));
   }

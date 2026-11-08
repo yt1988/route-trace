@@ -642,7 +642,7 @@ function litStop(id, on) {
 }
 
 // ---------- sharing (the 1ms.dog share component, copied verbatim to /assets/share/) ----------
-const SHARE = '/assets/share/share.js?v=8';
+const SHARE = '/assets/share/share.js?v=9';
 let banner = null;
 // A return trace's target is usually the visitor's own address, or a name that points at it (a home DDNS name). The
 // share dialog's box (unticked every time it opens) decides whether the card and the link show it; unticked, both keep
@@ -654,8 +654,9 @@ const shownTarget = (show) => (ownIp() && !show ? C.maskAddr(S.last.target) : S.
 const resultLink = async (show) => `${location.origin}${PATHS[LANG] || "/"}r/${await C.encodeResult(C.pack(S.last, S.me.home?.ip, !!show))}`;
 // someone else's result: shown as it was, under the banner that offers the visitor's own trace of the same target
 async function openLink(code) {
-  const o = await C.decodeResult(code);
-  if (!o) { $('#result').hidden = false; $('#result').innerHTML = `<div class="path-sum bad">${esc(t('link_bad'))}</div>`; return; }
+  // a browser too old to decompress the link is told so, rather than that the link is broken
+  const o = await C.decodeResult(code).catch(() => 'old');
+  if (!o || o === 'old') { $('#result').hidden = false; $('#result').innerHTML = `<div class="path-sum bad">${esc(t(o ? 'link_old' : 'link_bad'))}</div>`; return; }
   S.last = C.unpack(o);
   if (S.last.dir === 'out') { S.target = S.last.target; elTarget.value = S.target; syncGo(); }
   await renderResult();

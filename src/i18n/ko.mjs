@@ -66,6 +66,7 @@ export default {
   no_result: '결과 없음',
   open_fail: '이 추적을 열 수 없어요: {msg}. Globalping 결과는 일정 기간만 보관돼요.',
   link_bad: '이 결과를 읽을 수 없어요. 링크가 잘렸을 수 있어요.',
+  link_old: '이 브라우저는 너무 오래되어 공유 링크를 열 수 없습니다. 브라우저를 업데이트하거나 다른 브라우저로 여세요.',
   quota_ok: '이번 시간에 {left}번 더 추적할 수 있어요 (한 번에 1번)',
   quota_out: 'Globalping 한도를 다 썼어요. 약 {min}분 뒤에 다시 쓸 수 있어요 (IP당 시간마다 250번)',
   quota_tip: 'Globalping에 접속한 IP 기준이에요. 프록시를 쓰면 같은 출구를 쓰는 사람과 함께 써요',

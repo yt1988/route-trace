@@ -1,27 +1,34 @@
-// A shared result in a link: /<lang>/r/<code>, code = "1~" + base64url(deflate-raw(JSON)), the same scheme as
-// reach-check. The first segment is the format's version: a new format gets a new number, and old links keep opening.
+// A shared result in a link: /<lang>/r/<code>. The first segment is the format's version: a new format gets a new
+// number, and old links keep opening.
+//   "2~" + codec.js pack(JSON): "z…" compressed, "u…" plain when the browser can't compress (before Chrome 103 and
+//         Safari 16.4 CompressionStream("deflate-raw") is missing, and making a link used to throw)
+//   "1~" + base64url(deflate-raw(JSON)): links made before 2026-11-08, read with { legacy: true }
+// codec.js is the 1ms.dog tools' shared copy (byte for byte); the page and the Worker both import it from here.
 // The result holds what the page showed, so the link reproduces it without asking Globalping again (its results
 // expire): the probe, every hop's numbers and where each hop was placed. Never the visitor's own IP: on a return
 // trace the target is the visitor, so unless they tick the box in the share dialog the link keeps only the first half of
 // that address.
 
-export const CODE_VERSION = '1';
+import { pack as packText, unpack as unpackText, CodecError } from './codec.js';
 
-const b64url = (bytes) => { let s = ''; for (const b of bytes) s += String.fromCharCode(b); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
-const unb64url = (s) => { const bin = atob(s.replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(bin, (c) => c.charCodeAt(0)); };
-const pipe = async (bytes, stream) => new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer());
+export const CODE_VERSION = '2';
 
 export async function encodeResult(obj) {
-  return CODE_VERSION + '~' + b64url(await pipe(new TextEncoder().encode(JSON.stringify(obj)), new CompressionStream('deflate-raw')));
+  return CODE_VERSION + '~' + await packText(JSON.stringify(obj));
 }
-// null when the code can't be read: garbled, cut short, or a version this code doesn't know
+// null when the code can't be read: garbled, cut short, or a version this code doesn't know. Throws
+// CodecError("inflate") when the link is fine but this browser can't decompress it (the page says the browser is too
+// old; the Worker always can).
 export async function decodeResult(code) {
-  const m = /^1~([A-Za-z0-9_-]{8,8000})$/.exec(code || '');
+  const m = /^(?:1~([A-Za-z0-9_-]{8,8000})|2~([zu][A-Za-z0-9_-]{8,16000}))$/.exec(code || '');
   if (!m) return null;
   try {
-    const r = JSON.parse(new TextDecoder().decode(await pipe(unb64url(m[1]), new DecompressionStream('deflate-raw'))));
+    const r = JSON.parse(m[1] ? await unpackText(m[1], { legacy: true }) : await unpackText(m[2]));
     return r && typeof r.t === 'string' && Array.isArray(r.p) && Array.isArray(r.h) ? r : null;
-  } catch { return null; }
+  } catch (e) {
+    if (e instanceof CodecError && e.reason === 'inflate') throw e;
+    return null;
+  }
 }
 // "/r/<code>" or "/<lang folder>/r/<code>" → { slug, code }
 export function sharePath(path) {
