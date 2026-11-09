@@ -136,6 +136,7 @@ export default {
   sum_jit: '抖動',
   sum_hops: '{n} 跳',
   to_reach: '從全球 18 個地區測能不能連上',
+  to_ping: '從 18 個地區測延遲',
   tl_start: '探針 · 起點',
   tl_lan: '第 1–{n} 跳是探針自己的區域網路，不計入',
   tl_end: '終點',

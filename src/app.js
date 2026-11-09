@@ -271,6 +271,17 @@ function syncGo() {
   $('#go').disabled = !S.running && !ok;
   $('#go').textContent = S.running ? t('stop') : t('go');
   $('#go').classList.toggle('stop', S.running);
+  syncPing();
+}
+// Beside the target, once it is a real host: the same address pinged from 18 regions (Global Ping), from the shell's
+// <meta name="ping">; a self-hosted copy has no meta, so no link. Outbound only: a return trace's target is the
+// visitor's own address, not a site to check from elsewhere.
+function syncPing() {
+  const a = $('#toPing'), base = tool('ping'), target = S.dir === 'out' && validTarget(S.target) ? S.target : '';
+  if (!base || !target) { a.hidden = true; return; }
+  if (!a.innerHTML) a.innerHTML = esc(t('to_ping')) + EXT;
+  a.hidden = false;
+  a.href = `${base}${langDir()}?t=${encodeURIComponent(target)}`;
 }
 const validTarget = (t) => /^[a-z0-9.-]+\.[a-z0-9-]{2,}$/i.test(t || '') || isIp(t);
 

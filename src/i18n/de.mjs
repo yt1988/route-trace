@@ -136,6 +136,7 @@ export default {
   sum_jit: 'Jitter',
   sum_hops: '{n} Hops',
   to_reach: 'Erreichbarkeit aus 18 Regionen prüfen',
+  to_ping: 'Latenz aus 18 Regionen',
   tl_start: 'Sonde · Start',
   tl_lan: 'Hops 1–{n} sind das eigene LAN der Sonde und zählen nicht',
   tl_end: 'Ziel',

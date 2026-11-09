@@ -136,6 +136,7 @@ export default {
   sum_jit: 'ジッター',
   sum_hops: '{n} ホップ',
   to_reach: '世界 18 地域から接続できるか調べる',
+  to_ping: '18 地域から遅延を測る',
   tl_start: 'プローブ · 出発点',
   tl_lan: '1–{n} ホップ目はプローブ自身の LAN なので数えません',
   tl_end: '終点',

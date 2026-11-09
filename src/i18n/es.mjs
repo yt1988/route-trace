@@ -136,6 +136,7 @@ export default {
   sum_jit: 'Jitter',
   sum_hops: '{n} saltos',
   to_reach: 'Comprobar si se llega desde 18 regiones',
+  to_ping: 'Latencia desde 18 regiones',
   tl_start: 'Sonda · inicio',
   tl_lan: 'Los saltos 1–{n} son la red local de la sonda y no cuentan',
   tl_end: 'final',

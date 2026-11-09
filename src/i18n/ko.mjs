@@ -136,6 +136,7 @@ export default {
   sum_jit: '지터',
   sum_hops: '{n}홉',
   to_reach: '전 세계 18개 지역에서 접속되는지 확인',
+  to_ping: '18개 지역에서 지연 측정',
   tl_start: '프로브 · 출발',
   tl_lan: '1–{n}번째 홉은 프로브 자체 LAN이라 세지 않아요',
   tl_end: '도착',

@@ -87,6 +87,7 @@ select option:checked { background-color: var(--soft); }
 .route { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto; gap: 10px; align-items: end; }
 .end { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .end-k { display: flex; align-items: center; gap: 8px; min-height: 32px; font-size: 12px; color: var(--muted); padding-left: 2px; }
+.end-k .ext { margin-left: auto; white-space: nowrap; }
 .dir { display: inline-flex; background: var(--soft); border-radius: 9px; padding: 2px; }
 .dir button { border: 0; background: none; min-height: 30px; padding: 0 12px; border-radius: 7px; cursor: pointer; font-size: 13px; color: var(--muted); }
 .dir button[aria-selected="true"] { background: var(--panel); color: var(--fg); font-weight: 600; box-shadow: 0 1px 3px var(--shadow); }

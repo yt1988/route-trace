@@ -136,6 +136,7 @@ export default {
   sum_jit: 'Gigue',
   sum_hops: '{n} sauts',
   to_reach: 'Vérifier l’accès depuis 18 régions',
+  to_ping: 'Latence depuis 18 régions',
   tl_start: 'Sonde · départ',
   tl_lan: 'Les sauts 1–{n} sont le réseau local de la sonde et ne comptent pas',
   tl_end: 'arrivée',

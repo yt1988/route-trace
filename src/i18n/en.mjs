@@ -136,6 +136,7 @@ export default {
   sum_jit: 'Jitter',
   sum_hops: '{n} hops',
   to_reach: 'Check reachability from 18 regions',
+  to_ping: 'Latency from 18 regions',
   tl_start: 'Probe · start',
   tl_lan: 'Hops 1–{n} are the probe’s own LAN and don’t count',
   tl_end: 'end',
