@@ -53,7 +53,7 @@ export async function build({ check = false } = {}) {
   const root = fileURLToPath(new URL('..', import.meta.url));
   const opts = { bundle: true, minify: true, format: 'iife', target: 'es2019', legalComments: 'none', write: false, absWorkingDir: root };
   const js = (await bundle({ ...opts, entryPoints: [fileURLToPath(new URL('app.js', src))] })).outputFiles[0].text;
-  const cssFull = (await Promise.all(['fonts.css', 'style.css'].map((f) => readFile(new URL(f, src), 'utf8')))).join('\n');
+  const cssFull = (await Promise.all(['fonts.css', 'base.css', 'style.css'].map((f) => readFile(new URL(f, src), 'utf8')))).join('\n');
   const css = (await transform(cssFull, { loader: 'css', minify: true, legalComments: 'none' })).code;
   const csp = cspOf();
   const jsName = `app.${hash(js)}.js`, cssName = `app.${hash(css)}.css`;
