@@ -35,6 +35,35 @@ const EXT = '<svg class="ext-i" viewBox="0 0 16 16" fill="none" stroke="currentC
 // an AS number as data: a dotted link to ASN lookup when that tool is there, plain text otherwise
 const asLink = (asn) => { const b = tool('asn'); return asn ? (b ? `<a class="data" href="${b}${langDir()}AS${asn}" target="_blank" rel="noopener" title="${esc(t('asn_title', { asn }))}">AS${asn}</a>` : `AS${asn}`) : ''; };
 const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+// `<dialog>` is not in every browser the tools get (iOS Safari < 15.4, Firefox < 98, in-app WebViews). There the
+// boxes (help, picker) would neither open nor even hide, so they go up as a fixed layer over a shade, closed by
+// Escape or a click outside (tool-contract §4). Checked at call time: the same code runs either way.
+const canModal = () => typeof HTMLDialogElement === 'function' && typeof HTMLDialogElement.prototype.showModal === 'function';
+let shade = null, modal = null;
+function showDlg(d) {
+  if (canModal()) { d.showModal(); return; }
+  modal = d;
+  d.setAttribute('open', ''); d.classList.add('dlg-fb');
+  if (!shade) {
+    shade = document.createElement('div');
+    shade.className = 'dlg-shade';
+    shade.addEventListener('click', () => hideDlg(modal));
+    document.body.appendChild(shade);
+    document.addEventListener('keydown', onEsc);
+    document.documentElement.classList.add('dlg-lock');
+  }
+  setTimeout(() => { if (modal === d) d.querySelector('input, select, button')?.focus(); }, 0);
+}
+function hideDlg(d) {
+  if (!d) return;
+  if (canModal()) { d.close(); return; }
+  d.removeAttribute('open'); d.classList.remove('dlg-fb');
+  if (modal === d) modal = null;
+  shade?.remove(); shade = null;
+  document.removeEventListener('keydown', onEsc);
+  document.documentElement.classList.remove('dlg-lock');
+}
+function onEsc(e) { if (e.key === 'Escape') hideDlg(modal); }
 
 const S = {
   slots: [], me: { groups: [], home: null, exits: [], ready: false }, dir: 'out', ref: 'home',
@@ -76,9 +105,9 @@ $('#helpNav').addEventListener('click', (e) => { const b = e.target.closest('[da
 $('#helpSel').onchange = (e) => showQ(+e.target.value);
 $('#helpPrev').onclick = () => showQ(qi - 1);
 $('#helpNext').onclick = () => showQ(qi + 1);
-$('#helpBtn').addEventListener('click', () => $('#help').showModal());
-$('#helpClose').addEventListener('click', () => $('#help').close());
-$('#help').addEventListener('click', (e) => { if (e.target === $('#help')) $('#help').close(); });
+$('#helpBtn').addEventListener('click', () => showDlg($('#help')));
+$('#helpClose').addEventListener('click', () => hideDlg($('#help')));
+$('#help').addEventListener('click', (e) => { if (e.target === $('#help')) hideDlg($('#help')); });
 
 // ---------- options: three small choices behind one button; the button names what differs from the default ----------
 const DEF = { proto: 'ICMP', packets: '10', ipv: '' };
@@ -329,12 +358,12 @@ function renderOrigin() {
 // ---------- picker ----------
 const dlg = $('#picker'); let pkMap = null, pkRows = [], pkActive = -1, pkType = '', pkRef = 'home';
 $('#originBtn').addEventListener('click', openPicker);
-$('#pkClose').addEventListener('click', () => dlg.close());
-dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+$('#pkClose').addEventListener('click', () => hideDlg(dlg));
+dlg.addEventListener('click', (e) => { if (e.target === dlg) hideDlg(dlg); });
 function openPicker() {
   if (!S.slots.length) return;
   pkRef = S.origin?.ref || S.ref; renderRefSeg();
-  dlg.showModal();
+  showDlg(dlg);
   if (!pkMap) pkMap = createMap($('#pkMap'), { labels: MAPL(), onCity: (c) => { $('#pkQ').value = city(c.city); pkRender(); } });
   $('#pkQ').value = ''; pkRender(); $('#pkQ').focus();
 }
@@ -366,7 +395,7 @@ function pkMove(d) {
 function pick(row) {
   S.origin = { slot: row.s, m: row.m, ref: pkRef }; S.originAuto = false;
   const rec = store.get('rt:recent', []).filter((k) => k !== row.s.key); rec.unshift(row.s.key); store.set('rt:recent', rec.slice(0, 6));
-  dlg.close(); renderOrigin(); if (!S.last?.a) idleGlobe();
+  hideDlg(dlg); renderOrigin(); if (!S.last?.a) idleGlobe();
 }
 function pkRender() {
   const q = $('#pkQ').value.trim();

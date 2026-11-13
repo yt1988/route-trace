@@ -208,6 +208,12 @@ a.data { color: inherit; text-decoration: underline dotted; text-underline-offse
 .picker { width: min(1000px, calc(100vw - 24px)); height: min(720px, calc(100vh - 24px)); max-width: none; max-height: none; padding: 0; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); color: var(--fg); box-shadow: 0 20px 60px var(--shadow); }
 .picker[open] { display: flex; flex-direction: column; }
 .picker::backdrop, .help::backdrop { background: #0006; }
+/* Browsers without <dialog> (iOS Safari < 15.4, Firefox < 98, in-app WebViews): the boxes stay hidden until opened,
+   then sit as a fixed layer over a shade (app.js adds .dlg-fb and .dlg-shade; tool-contract §4). */
+dialog:not([open]) { display: none; }
+dialog.dlg-fb { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0; z-index: 901; overflow: auto; }
+.dlg-shade { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 900; background: #0006; }
+html.dlg-lock, html.dlg-lock body { overflow: hidden; }
 .pk-head { padding: 12px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--line); }
 .pk-search { display: flex; gap: 8px; }
 #pkQ { flex: 1; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 16px; }
