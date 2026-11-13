@@ -682,7 +682,7 @@ function litStop(id, on) {
 }
 
 // ---------- sharing (the 1ms.dog share component, copied verbatim to /assets/share/) ----------
-const SHARE = '/assets/share/share.js?v=9';
+const SHARE = '/assets/share/share.js?v=10';
 let banner = null;
 // A return trace's target is usually the visitor's own address, or a name that points at it (a home DDNS name). The
 // share dialog's box (unticked every time it opens) decides whether the card and the link show it; unticked, both keep
