@@ -146,6 +146,7 @@ export default {
   why_into: '{a}에서 국경을 넘어 {c}(으)로. 직선 약 {km} km, 광섬유 왕복 최소 약 {rtt} ms',
   why_expect: '두 홉은 약 {km} km 떨어져 있어 거리만으로는 약 {rtt} ms면 돼요',
   why_km: '광섬유로 최대 {km} km를 더 간 셈이에요',
+  why_hop: '{a}에서 {b}까지 직선 약 {km} km, 광섬유 왕복 최소 약 {rtt} ms',
   border: '국경을 넘어 {c}(으)로',
   tag_loss: '손실 {n}%',
   ix_port: '{name} 포트',

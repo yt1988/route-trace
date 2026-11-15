@@ -89,6 +89,11 @@ test('analyze the real Beijing Mobile -> x.com trace', () => {
   assert.ok(!a.segs.some((s) => s.owner === 'local'));
   assert.equal(a.local.length, 5);
   assert.equal(a.segs[0].start, a.localFloor);
+  // the segment crossing the border carries both places and the least fibre round trip between them (#123)
+  const cross = a.segs.find((s) => s.hops.includes(a.border));
+  assert.ok(cross && cross.fromLoc && cross.toLoc);
+  assert.ok(cross.km > 1500 && cross.km < 2200);
+  assert.ok(cross.fibre > 15 && cross.fibre < 22);
 });
 
 test('a jump that matches a Pacific crossing is explained as one (Xi\'an Unicom -> x.com)', () => {
@@ -126,6 +131,23 @@ test('exits group by network: home line first, proxies after', () => {
   assert.equal(g[0].asn, 4808); assert.ok(!g[0].proxy); assert.equal(g[0].ip, '203.0.113.81'); assert.equal(g[0].zh[4], '联通');
   assert.deepEqual(g.slice(1).map((x) => x.asn).sort(), [16509, 45102]);
   assert.ok(g[1].proxy && g[2].proxy);
+});
+
+test('a proxy group that more checks agree on is never "your network"', () => {
+  // the #122 report: a Tokyo Cogent (AS174) exit answered every HTTP check; the home line was seen only by WebRTC
+  const seen = ['1ms.dog', 'ipip.net', 'Cloudflare', 'ip.sb', 'ipinfo.io', 'IPv4', 'IPv6'].map((by) => ({ ip: '203.0.113.7', by }))
+    .concat([{ ip: '198.51.100.9', by: 'WebRTC' }]);
+  const geo = {
+    '203.0.113.7': { cc: 'JP', city: 'Tokyo', asn: 174, org: null, lat: 35.7, lon: 139.7, q: 2 },
+    '198.51.100.9': { cc: 'CN', city: 'Hangzhou', asn: 56041, org: 'China Mobile', lat: 30.3, lon: 120.2, q: 1 },
+  };
+  const g = L.groupExits(seen, geo);
+  const cogent = g.find((x) => x.asn === 174);
+  assert.equal(cogent.by.length, 7);
+  assert.ok(cogent.proxy, 'AS174 is a transit network, so its exit is a proxy');
+  assert.equal(L.pickHome(g).asn, 56041);
+  // even if the proxy network went unrecognised, the group WebRTC saw is the home line, not the one more checks agree on
+  assert.equal(L.pickHome(g.map((x) => ({ ...x, proxy: false }))).asn, 56041);
 });
 
 

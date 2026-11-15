@@ -146,6 +146,7 @@ export default {
   why_into: 'von {a} nach {c}, etwa {km} km Luftlinie, mindestens {rtt} ms Rundreise in Glasfaser',
   why_expect: 'die beiden Hops liegen etwa {km} km auseinander, das braucht nur etwa {rtt} ms',
   why_km: 'bis zu {km} km zusätzliche Glasfaser',
+  why_hop: 'von {a} nach {b}, etwa {km} km Luftlinie, mindestens {rtt} ms Rundreise in Glasfaser',
   border: 'Verlässt das Land, nach {c}',
   tag_loss: '{n} % Verlust',
   ix_port: 'Port von {name}',

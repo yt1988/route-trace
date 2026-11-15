@@ -146,6 +146,7 @@ export default {
   why_into: '从{a}跨境进入{c}，直线约 {km} km，光纤往返至少约 {rtt} ms',
   why_expect: '两跳相距约 {km} km，按距离只需约 {rtt} ms',
   why_km: '相当于多走了约 {km} km 光纤',
+  why_hop: '{a}到{b}直线约 {km} km，光纤往返至少约 {rtt} ms',
   border: '出境，进入{c}',
   tag_loss: '丢包 {n}%',
   ix_port: '{name} 的端口',

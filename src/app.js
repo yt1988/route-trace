@@ -151,7 +151,7 @@ async function init() {
 }
 function setExits(groups) {
   S.me.groups = groups;
-  S.me.home = groups.find((g) => !g.proxy) || groups[0] || null;
+  S.me.home = L.pickHome(groups);
   S.me.exits = groups.filter((g) => g !== S.me.home);
   renderExits();
   if (!S.last?.a) idleGlobe();
@@ -614,7 +614,20 @@ function timeline(a, target, live) {
           : bigJump.expect != null ? t('why_expect', { km: num(bigJump.dist), rtt: Math.round(bigJump.expect) }) : t('why_km', { km: num(L.kmFor(bigJump.ms)) }));
       out.push(`<li class="note bad"><span class="dot"></span><span><b>+${Math.round(bigJump.ms)} ms</b> ${why}</span></li>`);
     }
-    if (a.border && a.borderCc && s.hops.includes(a.border) && !hasJump) out.push(`<li class="note info"><span class="dot"></span><span>${esc(t('border', { c: country(a.borderCc) }))}</span></li>`);
+    // The border segment always says how far the two places are and the least a round trip over fibre takes; without
+    // a located pair it keeps the short "leaves the country" line. Other long segments get the same floor, quieter.
+    const borderSeg = !!(a.border && s.hops.includes(a.border));
+    // the big jump's own note already says the border distance only when it is the "into another country" one
+    if (borderSeg && !(hasJump && bigJump.into && !bigJump.far)) {
+      const c = a.borderCc || s.toLoc?.cc;
+      if (s.fibre != null && s.km >= 100 && s.fromLoc?.city && c) {
+        out.push(`<li class="note info"><span class="dot"></span><span>${esc(t('why_into', { a: city(s.fromLoc.city), c: country(c), km: num(s.km), rtt: Math.round(s.fibre) }))}</span></li>`);
+      } else if (!hasJump && c) {
+        out.push(`<li class="note info"><span class="dot"></span><span>${esc(t('border', { c: country(c) }))}</span></li>`);
+      }
+    } else if (!hasJump && s.fibre != null && s.km >= 300 && s.fromLoc?.city && s.toLoc?.city) {
+      out.push(`<li class="note quiet"><span class="dot"></span><span>${esc(t('why_hop', { a: city(s.fromLoc.city), b: city(s.toLoc.city), km: num(s.km), rtt: Math.round(s.fibre) }))}</span></li>`);
+    }
     const w = Math.max(2, (s.cost / scaleMax) * 100);
     out.push(`<li class="st t${tierOf(s.cost)}${hasJump ? ' worst' : ''}"><span class="dot"></span><div class="st-b"><b class="${s.line?.tone === 'premium' ? 'prem' : ''}">${esc(segName(s))}</b><span class="m">${[s.place ? esc(city(s.place)) : '', asLink(s.asn)].filter(Boolean).join(' · ')}</span></div>`
       + `<span class="st-bar"><i style="width:${w}%"></i></span><span class="st-ms">+${Math.round(s.cost)} <span class="m">ms</span></span></li>`);

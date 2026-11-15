@@ -65,9 +65,14 @@ export function normName(name) {
 
 // ---------- exits ----------
 // Same grouping as the 1ms.dog home page: one group per network (AS when known), so an ISP's IPv4 and IPv6 are one
-// exit; data-centre networks are proxy exits. Home lines first, then the network most checks agree on.
-export const DC_RE = /amazon|google|microsoft|azure|digitalocean|vultr|choopa|constant company|linode|akamai|ovh|hetzner|oracle|alibaba|aliyun|tencent|huawei|m247|datacamp|cloudflare|leaseweb|contabo|hostinger|it7|racknerd|colocrossing|psychz|zenlayer|g-core|gcore|hostwinds|scaleway|ionos|kamatera|upcloud|bandwagon|dmit|cogent|quadranet|servers\.com|packet|equinix|fastly|cdn77|datapacket|tzulo|hostdare|greencloud|nexeon|frantech|buyvm|hosting|vps|data ?cent/i;
-const DC_ASN = new Set([16509, 14618, 15169, 396982, 8075, 13335, 45102, 37963, 45090, 132203, 55990, 14061, 20473, 63949, 16276, 24940, 31898, 9009, 212238, 54113, 20940]);
+// exit; data-centre networks are proxy exits. Home lines first, then the network most checks agree on. The keywords
+// follow egress's list (mullvad / proton / bytedance …), and the ASNs cover the transit networks a proxy exit most
+// often shows up on — AS174 (Cogent) was the reported one: its geo answer can have no org at all.
+export const DC_RE = /amazon|google|microsoft|azure|digitalocean|vultr|choopa|constant company|linode|akamai|ovh|hetzner|oracle|alibaba|aliyun|tencent|huawei|m247|datacamp|cloudflare|leaseweb|contabo|hostinger|it7|racknerd|colocrossing|psychz|zenlayer|g-core|gcore|hostwinds|scaleway|ionos|kamatera|upcloud|bandwagon|dmit|cogent|quadranet|servers\.com|packet|equinix|fastly|cdn77|datapacket|tzulo|hostdare|greencloud|nexeon|frantech|buyvm|hosting|vps|data ?cent|mullvad|proton|nord|express ?vpn|surfshark|private internet|ucloud|kingsoft|baidu cloud|bytedance|volcano/i;
+// cloud/VPS networks, then transit networks (Cogent, Arelion, NTT, GTT, Lumen, PCCW Global, Orange Business, Tata,
+// Zayo, Hurricane Electric, RETN); consumer ISPs that also sell transit are deliberately left out
+const DC_ASN = new Set([16509, 14618, 15169, 396982, 8075, 13335, 45102, 37963, 45090, 132203, 55990, 14061, 20473, 63949, 16276, 24940, 31898, 9009, 212238, 54113, 20940,
+  174, 1299, 2914, 3257, 3356, 3491, 5511, 6453, 6461, 6939, 9002]);
 const fam6 = (x) => x.includes(':');
 const v6g = (a) => { const [h, tl = ''] = a.toLowerCase().split('::'), H = h ? h.split(':') : [], T = tl ? tl.split(':') : []; return [...H, ...Array(Math.max(0, 8 - H.length - T.length)).fill('0'), ...T].map((g) => g.padStart(4, '0')); };
 export const netOf = (x) => (fam6(x) ? v6g(x).slice(0, 4).join(':') : x.split('.').slice(0, 2).join('.'));
@@ -93,6 +98,13 @@ export function groupExits(seen, geo, zh = {}) {
     if (g.city && !CITY_ZH[g.city] && CITY_ZH[g.region]) g.city = g.region;
   }
   return G.filter((g) => g.lat != null).sort((a, b) => a.proxy - b.proxy || b.by.length - a.by.length);
+}
+// The visitor's own line. A proxy can be seen by every HTTP check while the home line is seen only by WebRTC/STUN,
+// whose UDP usually leaves the browser without the proxy; so the number of checks that agree must never put a proxy
+// group in the "your network" slot. Datacenter networks never are the home line while an ordinary one exists.
+export function pickHome(groups) {
+  const local = groups.filter((g) => !g.proxy);
+  return local.find((g) => g.by.includes('WebRTC')) || local[0] || groups[0] || null;
 }
 
 // ---------- line labels ----------
@@ -424,6 +436,18 @@ export function analyze(hops, probe, geo = new Map()) {
   for (const s of segs) {
     const locs = s.hops.map((h) => h.loc).filter(good);
     s.place = locs.length ? locs[locs.length - 1].city : null;
+  }
+  // What the two ends of each segment are, and the least time light needs between them. Visitors ask for this at the
+  // border ("how many ms at least between the two places"), so it is kept for every segment and shown without
+  // needing a big jump.
+  let fromLoc = origin.city ? origin : null;
+  for (const s of segs) {
+    const locs = s.hops.map((h) => h.loc).filter(good);
+    s.toLoc = locs.length ? locs[locs.length - 1] : null;
+    s.fromLoc = fromLoc;
+    s.km = s.fromLoc && s.toLoc ? km(s.fromLoc, s.toLoc) : null;
+    s.fibre = s.km != null ? minRttFor(s.km) : null;
+    if (s.toLoc) fromLoc = s.toLoc;
   }
 
   // loss: what reaches the last answering hop is the path's loss; a hop that drops replies while later hops don't is

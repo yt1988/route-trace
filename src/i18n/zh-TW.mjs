@@ -146,6 +146,7 @@ export default {
   why_into: '從{a}跨境進入{c}，直線約 {km} km，光纖往返至少約 {rtt} ms',
   why_expect: '兩跳相距約 {km} km，照距離只需約 {rtt} ms',
   why_km: '相當於多走了約 {km} km 光纖',
+  why_hop: '{a}到{b}直線約 {km} km，光纖往返至少約 {rtt} ms',
   border: '出境，進入{c}',
   tag_loss: '掉包 {n}%',
   ix_port: '{name} 的連接埠',

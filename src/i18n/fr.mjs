@@ -146,6 +146,7 @@ export default {
   why_into: 'de {a} vers {c}, environ {km} km à vol d’oiseau, au moins {rtt} ms aller-retour en fibre',
   why_expect: 'les deux sauts sont à environ {km} km, soit seulement {rtt} ms environ',
   why_km: 'jusqu’à {km} km de fibre en plus',
+  why_hop: 'de {a} à {b}, environ {km} km à vol d’oiseau, au moins {rtt} ms aller-retour en fibre',
   border: 'Quitte le pays, vers {c}',
   tag_loss: '{n} % de perte',
   ix_port: 'port de {name}',

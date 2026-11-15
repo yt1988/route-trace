@@ -146,6 +146,7 @@ export default {
   why_into: '{a}から国境を越えて{c}へ。直線で約 {km} km、光ファイバー往復で少なくとも約 {rtt} ms',
   why_expect: '2 つのホップは約 {km} km しか離れておらず、距離だけなら約 {rtt} ms です',
   why_km: '光ファイバーにして最大 {km} km 分の遠回りに相当',
+  why_hop: '{a}から{b}まで直線で約 {km} km、光ファイバー往復で少なくとも約 {rtt} ms',
   border: '国境を越えて{c}へ',
   tag_loss: 'ロス {n}%',
   ix_port: '{name} のポート',

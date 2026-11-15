@@ -146,6 +146,7 @@ export default {
   why_into: 'de {a} para {c}, cerca de {km} km em linha reta, pelo menos {rtt} ms de ida e volta em fibra',
   why_expect: 'os dois saltos estão a cerca de {km} km, o que leva só uns {rtt} ms',
   why_km: 'até {km} km de fibra a mais',
+  why_hop: 'de {a} a {b}, cerca de {km} km em linha reta, pelo menos {rtt} ms de ida e volta em fibra',
   border: 'Sai do país, para {c}',
   tag_loss: '{n}% de perda',
   ix_port: 'porta de {name}',

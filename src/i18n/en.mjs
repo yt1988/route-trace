@@ -146,6 +146,7 @@ export default {
   why_into: 'from {a} into {c}, about {km} km in a straight line, at least {rtt} ms round trip in fibre',
   why_expect: 'the two hops are about {km} km apart, which takes only about {rtt} ms',
   why_km: 'as much as {km} km of extra fibre',
+  why_hop: '{a} to {b}, about {km} km in a straight line, at least {rtt} ms round trip in fibre',
   border: 'Leaves the country, into {c}',
   tag_loss: '{n}% loss',
   ix_port: 'port of {name}',
