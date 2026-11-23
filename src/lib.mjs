@@ -1,5 +1,6 @@
 // Route Trace prototype: pure logic (no DOM, no network), unit-tested in test/lib.test.mjs.
 // Probe matching, carrier families, line labels, hop geolocation fusion and path analysis.
+import { groupExits as coreGroupExits, kindOf, netOf } from './egress.js';
 
 // ---------- geometry ----------
 const R = 6371;
@@ -64,39 +65,49 @@ export function normName(name) {
 }
 
 // ---------- exits ----------
-// Same grouping as the 1ms.dog home page: one group per network (AS when known), so an ISP's IPv4 and IPv6 are one
-// exit; data-centre networks are proxy exits. Home lines first, then the network most checks agree on. The keywords
-// follow egress's list (mullvad / proton / bytedance …), and the ASNs cover the transit networks a proxy exit most
-// often shows up on — AS174 (Cogent) was the reported one: its geo answer can have no org at all.
-export const DC_RE = /amazon|google|microsoft|azure|digitalocean|vultr|choopa|constant company|linode|akamai|ovh|hetzner|oracle|alibaba|aliyun|tencent|huawei|m247|datacamp|cloudflare|leaseweb|contabo|hostinger|it7|racknerd|colocrossing|psychz|zenlayer|g-core|gcore|hostwinds|scaleway|ionos|kamatera|upcloud|bandwagon|dmit|cogent|quadranet|servers\.com|packet|equinix|fastly|cdn77|datapacket|tzulo|hostdare|greencloud|nexeon|frantech|buyvm|hosting|vps|data ?cent|mullvad|proton|nord|express ?vpn|surfshark|private internet|ucloud|kingsoft|baidu cloud|bytedance|volcano/i;
-// cloud/VPS networks, then transit networks (Cogent, Arelion, NTT, GTT, Lumen, PCCW Global, Orange Business, Tata,
-// Zayo, Hurricane Electric, RETN); consumer ISPs that also sell transit are deliberately left out
-const DC_ASN = new Set([16509, 14618, 15169, 396982, 8075, 13335, 45102, 37963, 45090, 132203, 55990, 14061, 20473, 63949, 16276, 24940, 31898, 9009, 212238, 54113, 20940,
-  174, 1299, 2914, 3257, 3356, 3491, 5511, 6453, 6461, 6939, 9002]);
+// Grouping and the direct/proxy verdict come from the site-wide egress core (src/egress.js, vendored; the egress
+// contract that goes with it). One exit per network (AS when known, else /16 or /64), so an ISP's IPv4 and IPv6 are one
+// Which exit is shown as the visitor's own line is this page's display rule (`pickHome` below).
+//
+// A proxy exit can leave through a transit network's own address, and those geo answers often have no organisation at
+// all — AS174 (Cogent) was the reported one. core's kindOf() reads organisation names and hosting/VPN ASNs, so the
+// transit networks the old local list carried are kept here as trace's own evidence until core carries them.
+const TRANSIT_ASN = new Set([174, 1299, 2914, 3257, 3356, 3491, 5511, 6453, 6461, 6939, 9002]);
+// The group a check belongs to: the two anchors are the "same path" evidence for the mainland and the outside (core's
+// GROUP_ANCHOR), STUN is UDP only. Used when a page wants core's pathOf(); trace's own verdict never equates a path
+// with "direct".
+const CHECK_GROUP = { 'probe.dog.1msapp.com': 'cn', 'probe.1ms.dog': 'intl', WebRTC: 'udp' };
+const groupOf = (by) => CHECK_GROUP[by] || 'web';
 const fam6 = (x) => x.includes(':');
-const v6g = (a) => { const [h, tl = ''] = a.toLowerCase().split('::'), H = h ? h.split(':') : [], T = tl ? tl.split(':') : []; return [...H, ...Array(Math.max(0, 8 - H.length - T.length)).fill('0'), ...T].map((g) => g.padStart(4, '0')); };
-export const netOf = (x) => (fam6(x) ? v6g(x).slice(0, 4).join(':') : x.split('.').slice(0, 2).join('.'));
 export function groupExits(seen, geo, zh = {}) {
   const geoOf = (ip) => geo[ip] || geo[Object.keys(geo).find((x) => fam6(x) === fam6(ip) && netOf(x) === netOf(ip))] || null;
-  const G = [];
+  // core groups by answer, so every answer gets an index of its own; `by` is what the page shows as "seen by".
+  const answers = [];
   for (const { ip, by } of seen) {
     const g0 = geoOf(ip); if (!g0) continue;   // shown once its network is known, so it never splits off and merges back
-    const key = g0.asn ? 'as' + g0.asn : 'net' + netOf(ip);
-    let g = G.find((x) => x.key === key);
-    if (!g) { g = { key, ips: [], by: [], cc: '', city: '', asn: null, org: '', lat: null, lon: null, q: -1 }; G.push(g); }
-    if (!g.ips.includes(ip)) g.ips.push(ip);
-    if (!g.by.includes(by)) g.by.push(by);
-    g.asn ||= g0.asn || null; g.org ||= g0.org || ''; g.cc ||= g0.cc || '';
-    // the most trusted source's place wins
-    if (g0.lat != null && (g0.q || 0) > g.q) { g.lat = g0.lat; g.lon = g0.lon; g.city = g0.city || g.city; g.region = g0.region; g.q = g0.q || 0; }
-    if (zh[ip]) g.zh = zh[ip];   // ipip.net: [国家, 省, 市, '', 运营商], best for mainland lines
+    answers.push({ idx: answers.length, id: String(answers.length), group: groupOf(by), by, ip, geo: g0, asn: g0.asn, org: g0.org });
   }
-  for (const g of G) {
-    g.proxy = DC_ASN.has(g.asn) || DC_RE.test(g.org || '');
+  const byIdx = new Map(answers.map((a) => [a.idx, a]));
+  const G = coreGroupExits(answers).map((e) => {
+    const g = { key: e.key, ips: [], by: [], cc: '', city: '', asn: e.asn ?? null, org: e.org || '', lat: null, lon: null, q: -1 };
+    for (const i of e.seenBy) {
+      const a = byIdx.get(+i); if (!a) continue;
+      if (!g.ips.includes(a.ip)) g.ips.push(a.ip);
+      if (!g.by.includes(a.by)) g.by.push(a.by);
+      g.cc ||= a.geo.cc || '';
+      // the most trusted source's place wins
+      if (a.geo.lat != null && (a.geo.q || 0) > g.q) { g.lat = a.geo.lat; g.lon = a.geo.lon; g.city = a.geo.city || g.city; g.region = a.geo.region; g.q = a.geo.q || 0; }
+      if (zh[a.ip]) g.zh = zh[a.ip];   // ipip.net: [国家, 省, 市, '', 运营商], best for mainland lines
+    }
+    g.asn = g.asn != null ? Number(g.asn) || g.asn : null;
+    const k = kindOf(g);
+    g.kind = k.kind;
+    g.proxy = k.kind === 'proxy' || TRANSIT_ASN.has(+g.asn);
     g.ip = g.ips.find((x) => !fam6(x)) || g.ips[0];
     g.eyeball = !g.proxy;
     if (g.city && !CITY_ZH[g.city] && CITY_ZH[g.region]) g.city = g.region;
-  }
+    return g;
+  });
   return G.filter((g) => g.lat != null).sort((a, b) => a.proxy - b.proxy || b.by.length - a.by.length);
 }
 // The visitor's own line. A proxy can be seen by every HTTP check while the home line is seen only by WebRTC/STUN,

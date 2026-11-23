@@ -151,6 +151,35 @@ test('a proxy group that more checks agree on is never "your network"', () => {
 });
 
 
+test('the two anchors are sources, and a matching path does not make an exit direct', () => {
+  // With a proxy on, both anchors see the proxy too: one path for a mainland and an outside destination only says the
+  // route is the same. The exit is a data centre, so it is a proxy (docs/egress-contract.md §2).
+  const seen = [
+    { ip: '198.51.100.91', by: 'probe.dog.1msapp.com' }, { ip: '198.51.100.91', by: 'probe.1ms.dog' },
+    { ip: '198.51.100.91', by: 'Cloudflare' }, { ip: '203.0.113.81', by: 'WebRTC' },
+  ];
+  const geo = {
+    '198.51.100.91': { cc: 'JP', city: 'Tokyo', asn: 16509, org: 'Amazon.com, Inc.', lat: 35.7, lon: 139.7, q: 2 },
+    '203.0.113.81': { cc: 'CN', city: 'Beijing', asn: 4808, org: null, lat: 39.9, lon: 116.4, q: 1 },
+  };
+  const g = L.groupExits(seen, geo);
+  const proxy = g.find((x) => x.asn === 16509);
+  assert.equal(proxy.by.length, 3);
+  assert.equal(proxy.kind, 'proxy');
+  assert.ok(proxy.proxy, 'anchors agreeing on the path does not make a data-centre exit direct');
+  assert.equal(L.pickHome(g).asn, 4808);
+});
+
+test('an exit only an anchor saw is still grouped by its network', () => {
+  const seen = [{ ip: '198.51.100.91', by: 'probe.1ms.dog' }, { ip: '203.0.113.81', by: 'probe.dog.1msapp.com' }];
+  const geo = {
+    '198.51.100.91': { cc: 'JP', city: 'Tokyo', asn: 16509, org: 'Amazon.com, Inc.', lat: 35.7, lon: 139.7, q: 2 },
+    '203.0.113.81': { cc: 'CN', city: 'Beijing', asn: 4808, org: null, lat: 39.9, lon: 116.4, q: 1 },
+  };
+  const g = L.groupExits(seen, geo);
+  assert.deepEqual(g.map((x) => [x.asn, x.proxy]), [[4808, false], [16509, true]]);
+});
+
 test('a return trace through CUG: unannounced backbone hops get their carrier, not "local", and no made-up city', () => {
   const f = JSON.parse(readFileSync(new URL('./fixtures/mtr-lax-dmit-cug-back.json', import.meta.url)));
   const geo = new Map(f.geo.map((g) => [g.ip, L.geoFromDb(g)]));

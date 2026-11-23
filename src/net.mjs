@@ -126,6 +126,10 @@ const asnNum = (v) => { const m = /(\d+)/.exec(String(v || '')); return m ? +m[1
 const cfGeo = (j) => ({ cc: j.country, city: j.city, region: j.region, asn: num(j.asn), org: j.asOrganization || null, lat: num(j.latitude), lon: num(j.longitude), q: 3 });
 // q: how much a source's city and coordinates are trusted (Cloudflare's own view of the connection beats the rest)
 const CHECKS = [
+  // The two anchors (docs/egress-contract.md §1): our own probes, not proxied and in no split-tunnel list, so they say
+  // which path an exit takes — a mainland destination and an outside one. Same answer shape as the rest: the address.
+  ['probe.dog.1msapp.com', () => getJ('https://probe.dog.1msapp.com:9443/conn', 4000).then((j) => ({ ip: j.ip }))],
+  ['probe.1ms.dog', () => getJ('https://probe.1ms.dog/conn', 4000).then((j) => ({ ip: j.ip }))],
   ['1ms.dog', () => fetch('/_ms/me', { cache: 'no-store', signal: AbortSignal.timeout(3000) }).then((r) => (r.ok ? r.json() : Promise.reject()))
     .then((j) => (j.ip ? { ip: j.ip, geo: { cc: j.country, city: j.city, region: j.region, asn: j.asn, org: j.org, lat: num(j.latitude), lon: num(j.longitude), q: 3 } } : Promise.reject()))],
   ['ipip.net', () => getJ('https://myip.ipip.net/json').then((j) => ({ ip: j.data.ip, zh: j.data.location }))],
