@@ -125,6 +125,7 @@ const num = (v) => (v == null || v === '' || !isFinite(+v) ? null : +v);
 const asnNum = (v) => { const m = /(\d+)/.exec(String(v || '')); return m ? +m[1] : null; };
 const cfGeo = (j) => ({ cc: j.country, city: j.city, region: j.region, asn: num(j.asn), org: j.asOrganization || null, lat: num(j.latitude), lon: num(j.longitude), q: 3 });
 // q: how much a source's city and coordinates are trusted (Cloudflare's own view of the connection beats the rest)
+const ANCHORS = new Set(['probe.dog.1msapp.com', 'probe.1ms.dog']);
 const CHECKS = [
   // The two anchors (docs/egress-contract.md §1): our own probes, not proxied and in no split-tunnel list, so they say
   // which path an exit takes — a mainland destination and an outside one. Same answer shape as the rest: the address.
@@ -160,7 +161,9 @@ export async function detectExits(onUpdate, groupExits) {
       if (r.geo?.cc && (!geo[r.ip] || (r.geo.q || 0) > (geo[r.ip].q || 0))) geo[r.ip] = { ...geo[r.ip], ...r.geo, org: r.geo.org || geo[r.ip]?.org };
       if (r.zh) zh[r.ip] = r.zh;
     }
-    for (const { ip } of seen) if (!geo[ip]) lookup(ip);
+    // places come last for the anchors: they are path evidence, and the six lookups go to the checks the page names
+    for (const { ip, by } of seen) if (!ANCHORS.has(by) && !geo[ip]) lookup(ip);
+    for (const { ip, by } of seen) if (ANCHORS.has(by) && !geo[ip]) lookup(ip);
     push();
   })));
   await Promise.allSettled(lookups);
