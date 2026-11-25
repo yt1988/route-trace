@@ -155,7 +155,7 @@ test('the two anchors are sources, and a matching path does not make an exit dir
   // With a proxy on, both anchors see the proxy too: one path for a mainland and an outside destination only says the
   // route is the same. The exit is a data centre, so it is a proxy (docs/egress-contract.md §2).
   const seen = [
-    { ip: '198.51.100.91', by: 'probe.dog.1msapp.com' }, { ip: '198.51.100.91', by: 'probe.1ms.dog' },
+    { ip: '198.51.100.91', by: 'probe2.example.com' }, { ip: '198.51.100.91', by: 'probe.example.com' },
     { ip: '198.51.100.91', by: 'Cloudflare' }, { ip: '203.0.113.81', by: 'WebRTC' },
   ];
   const geo = {
@@ -171,7 +171,7 @@ test('the two anchors are sources, and a matching path does not make an exit dir
 });
 
 test('an exit only an anchor saw is still grouped by its network', () => {
-  const seen = [{ ip: '198.51.100.91', by: 'probe.1ms.dog' }, { ip: '203.0.113.81', by: 'probe.dog.1msapp.com' }];
+  const seen = [{ ip: '198.51.100.91', by: 'probe.example.com' }, { ip: '203.0.113.81', by: 'probe2.example.com' }];
   const geo = {
     '198.51.100.91': { cc: 'JP', city: 'Tokyo', asn: 16509, org: 'Amazon.com, Inc.', lat: 35.7, lon: 139.7, q: 2 },
     '203.0.113.81': { cc: 'CN', city: 'Beijing', asn: 4808, org: null, lat: 39.9, lon: 116.4, q: 1 },
