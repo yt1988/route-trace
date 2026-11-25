@@ -59,6 +59,16 @@ npm run dev        # wrangler dev，打开 http://localhost:8807
 - 自动部署：把仓库接到 Cloudflare Workers Builds，构建命令填 `npm ci && npm test`。之后推送 `main` 就会部署。
 - 站点地址是构建参数：`SITE_URL=https://<your-domain> npm run build`，用于 canonical、sitemap 和分享链接。
 
+## 测量端点（部署注入）
+
+自己探针的地址是部署数据，不写进仓库，也不进构建产物：Worker 从 `env.MS_ANCHORS` 读，用 `HTMLRewriter` 写进每个页面的
+`<meta name="ms-anchors" content="cn=…;intl=…">`，页面用 `src/egress.js` 的 `readAnchors()` 读。
+
+- 设置：`npx wrangler secret put MS_ANCHORS --name route-trace`，值是完整 URL，两个键用 `;` 分隔。
+- 仓库、本地构建和 CI 里默认为空：页面没有这个 meta，两个探针的请求不发，出口仍由公开服务判定，界面不报错。
+- `wrangler.toml` 的 `assets.run_worker_first` 让 HTML 页面经过 Worker 注入，其他文件仍由静态资源直接提供。
+- 网页改端点格式或新增端点时，先按全站的注入契约改，再改这里和 `src/worker.js`。
+
 ## 约定
 
 - 测量请求从浏览器直接发给公共服务，不要改成经过自己的服务器。

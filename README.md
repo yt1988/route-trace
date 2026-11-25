@@ -20,12 +20,12 @@ crosses, where it leaves the country, which stretch takes a detour and where pac
 
 ## How it works
 
-Every request goes from your browser straight to public services. The only 1ms.dog machines involved are the two probes
-that answer with the address a connection came from; no result is collected or stored.
+Every request goes from your browser straight to public services. A deployment may add probes of its own (1ms.dog
+injects two): they only answer with the address a connection came from, and no result is collected or stored.
 
 | Step | Source |
 |---|---|
-| Your networks (home line and proxy exits) | the checks the 1ms.dog home page uses: `/_ms/me`, ipip.net, Cloudflare, ip.sb, ipinfo, IPv4-only and IPv6-only hosts, STUN, and two 1ms.dog probes (`/conn`, on the mainland and in Tokyo) in no split-tunnel list, which show which path an exit takes; grouped by AS, data-centre and VPN networks marked as proxies |
+| Your networks (home line and proxy exits) | the checks the 1ms.dog home page uses: `/_ms/me`, ipip.net, Cloudflare, ip.sb, ipinfo, IPv4-only and IPv6-only hosts, STUN; grouped by AS, data-centre and VPN networks marked as proxies. On 1ms.dog the deployment also injects two probes of its own (`/conn`) in no split-tunnel list, which show which path an exit takes |
 | The probe | Globalping's probe list. Outbound: same AS, else the same carrier (mainland carriers by family), else nearby. Return: closest to where the outbound trace ended, or one you pick |
 | The trace | Globalping MTR, one probe, 5–16 packets per hop |
 | Where each hop is | PeeringDB (exchange points), router names (IATA and CLLI codes), GeoJS, then ipinfo for country-only answers |
