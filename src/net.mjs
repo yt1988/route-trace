@@ -1,6 +1,7 @@
 // Route Trace prototype: every request leaves the visitor's own browser for a public service. Nothing goes through
 // a 1ms.dog server. Globalping (probes and MTR), GeoJS / IPinfo (where an IP is), AliDNS / Cloudflare DoH, STUN.
 import { geoFromDb } from './lib.mjs';
+import { readAnchors } from './egress.js';
 
 const GP = 'https://api.globalping.io/v1';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -124,22 +125,37 @@ const getJ = (u, ms = 6000) => fetch(bust(u), { cache: 'no-store', credentials: 
 const num = (v) => (v == null || v === '' || !isFinite(+v) ? null : +v);
 const asnNum = (v) => { const m = /(\d+)/.exec(String(v || '')); return m ? +m[1] : null; };
 const cfGeo = (j) => ({ cc: j.country, city: j.city, region: j.region, asn: num(j.asn), org: j.asOrganization || null, lat: num(j.latitude), lon: num(j.longitude), q: 3 });
+// Our own probes are deploy-time data (tool-contract §2): the site puts them in <meta name="ms-anchors">, a self-hosted
+// copy has none, and the page then asks only the public services. Each answer is the address this connection came
+// from; the host names what the page shows as "seen by".
+export function anchorSources(a = readAnchors()) {
+  const out = [];
+  for (const [group, url] of [['cn', a.cn], ['intl', a.intl]]) {
+    if (!url) continue;
+    try {
+      const u = new URL(url);
+      // a full http(s) URL is what the meta promises; anything else (typo, missing scheme) is one probe fewer
+      if (/^https?:$/.test(u.protocol) && u.hostname) out.push({ group, label: u.hostname, url: u.href });
+    } catch { /* not a URL: no probe */ }
+  }
+  return out;
+}
+const SOURCES = anchorSources();
+const ANCHORS = new Set(SOURCES.map((s) => s.label));
 // q: how much a source's city and coordinates are trusted (Cloudflare's own view of the connection beats the rest)
-const ANCHORS = new Set(['probe.dog.1msapp.com', 'probe.1ms.dog']);
 const CHECKS = [
   // The two anchors (docs/egress-contract.md §1): our own probes, not proxied and in no split-tunnel list, so they say
   // which path an exit takes — a mainland destination and an outside one. Same answer shape as the rest: the address.
-  ['probe.dog.1msapp.com', () => getJ('https://probe.dog.1msapp.com:9443/conn', 4000).then((j) => ({ ip: j.ip }))],
-  ['probe.1ms.dog', () => getJ('https://probe.1ms.dog/conn', 4000).then((j) => ({ ip: j.ip }))],
-  ['1ms.dog', () => fetch('/_ms/me', { cache: 'no-store', signal: AbortSignal.timeout(3000) }).then((r) => (r.ok ? r.json() : Promise.reject()))
+  ...SOURCES.map((s) => [s.label, s.group, () => getJ(s.url, 4000).then((j) => ({ ip: j.ip }))]),
+  ['1ms.dog', 'web', () => fetch('/_ms/me', { cache: 'no-store', signal: AbortSignal.timeout(3000) }).then((r) => (r.ok ? r.json() : Promise.reject()))
     .then((j) => (j.ip ? { ip: j.ip, geo: { cc: j.country, city: j.city, region: j.region, asn: j.asn, org: j.org, lat: num(j.latitude), lon: num(j.longitude), q: 3 } } : Promise.reject()))],
-  ['ipip.net', () => getJ('https://myip.ipip.net/json').then((j) => ({ ip: j.data.ip, zh: j.data.location }))],
-  ['Cloudflare', () => getJ('https://speed.cloudflare.com/meta').then((j) => ({ ip: j.clientIp, geo: cfGeo(j) }))],
-  ['ip.sb', () => getJ('https://api.ip.sb/geoip').then((j) => ({ ip: j.ip, geo: { cc: j.country_code, city: j.city, region: j.region, asn: num(j.asn), org: j.isp || j.asn_organization, lat: num(j.latitude), lon: num(j.longitude), q: 1 } }))],
-  ['ipinfo.io', () => getJ('https://ipinfo.io/json').then((j) => { const [lat, lon] = String(j.loc || '').split(',').map(num); return { ip: j.ip, geo: { cc: j.country, city: j.city, region: j.region, asn: asnNum(j.org), org: String(j.org || '').replace(/^AS\d+\s*/, ''), lat, lon, q: 2 } }; })],
-  ['IPv4', () => getJ('https://ipv4-check-perf.radar.cloudflare.com/').then((j) => ({ ip: j.ip_address, geo: { ...cfGeo(j), org: null } }))],
-  ['IPv6', () => getJ('https://ipv6-check-perf.radar.cloudflare.com/').then((j) => ({ ip: j.ip_address, geo: { ...cfGeo(j), org: null } }))],
-  ['WebRTC', () => Promise.all([stunSelf(STUN_NEAR), stunSelf(STUN_FAR)]).then(([a, b]) => { const l = [...new Set([...a, ...b])]; return l.length ? l.map((ip) => ({ ip })) : Promise.reject(); })],
+  ['ipip.net', 'web', () => getJ('https://myip.ipip.net/json').then((j) => ({ ip: j.data.ip, zh: j.data.location }))],
+  ['Cloudflare', 'web', () => getJ('https://speed.cloudflare.com/meta').then((j) => ({ ip: j.clientIp, geo: cfGeo(j) }))],
+  ['ip.sb', 'web', () => getJ('https://api.ip.sb/geoip').then((j) => ({ ip: j.ip, geo: { cc: j.country_code, city: j.city, region: j.region, asn: num(j.asn), org: j.isp || j.asn_organization, lat: num(j.latitude), lon: num(j.longitude), q: 1 } }))],
+  ['ipinfo.io', 'web', () => getJ('https://ipinfo.io/json').then((j) => { const [lat, lon] = String(j.loc || '').split(',').map(num); return { ip: j.ip, geo: { cc: j.country, city: j.city, region: j.region, asn: asnNum(j.org), org: String(j.org || '').replace(/^AS\d+\s*/, ''), lat, lon, q: 2 } }; })],
+  ['IPv4', 'stack', () => getJ('https://ipv4-check-perf.radar.cloudflare.com/').then((j) => ({ ip: j.ip_address, geo: { ...cfGeo(j), org: null } }))],
+  ['IPv6', 'stack', () => getJ('https://ipv6-check-perf.radar.cloudflare.com/').then((j) => ({ ip: j.ip_address, geo: { ...cfGeo(j), org: null } }))],
+  ['WebRTC', 'udp', () => Promise.all([stunSelf(STUN_NEAR), stunSelf(STUN_FAR)]).then(([a, b]) => { const l = [...new Set([...a, ...b])]; return l.length ? l.map((ip) => ({ ip })) : Promise.reject(); })],
 ];
 // onUpdate(groups) fires as answers arrive; resolves with the final groups (see lib.groupExits).
 export async function detectExits(onUpdate, groupExits) {
@@ -152,12 +168,12 @@ export async function detectExits(onUpdate, groupExits) {
       push();
     }).catch(() => {}));
   };
-  await Promise.allSettled(CHECKS.map(([by, f]) => f().then((res) => {
+  await Promise.allSettled(CHECKS.map(([by, group, f]) => f().then((res) => {
     for (const r of [].concat(res)) {
       if (!r?.ip) continue;
       r.ip = String(r.ip).replace(/^\[|\]$/g, '');   // some answers bracket IPv6 addresses
       r.zh && (r.zh = r.zh);
-      seen.push({ ip: r.ip, by });
+      seen.push({ ip: r.ip, by, group });
       if (r.geo?.cc && (!geo[r.ip] || (r.geo.q || 0) > (geo[r.ip].q || 0))) geo[r.ip] = { ...geo[r.ip], ...r.geo, org: r.geo.org || geo[r.ip]?.org };
       if (r.zh) zh[r.ip] = r.zh;
     }

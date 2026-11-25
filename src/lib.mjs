@@ -73,19 +73,19 @@ export function normName(name) {
 // all — AS174 (Cogent) was the reported one. core's kindOf() reads organisation names and hosting/VPN ASNs, so the
 // transit networks the old local list carried are kept here as trace's own evidence until core carries them.
 const TRANSIT_ASN = new Set([174, 1299, 2914, 3257, 3356, 3491, 5511, 6453, 6461, 6939, 9002]);
-// The group a check belongs to: the two anchors are the "same path" evidence for the mainland and the outside (core's
-// GROUP_ANCHOR), STUN is UDP only. Used when a page wants core's pathOf(); trace's own verdict never equates a path
-// with "direct".
-const CHECK_GROUP = { 'probe.dog.1msapp.com': 'cn', 'probe.1ms.dog': 'intl', WebRTC: 'udp' };
-const groupOf = (by) => CHECK_GROUP[by] || 'web';
+// The group a check belongs to (core's GROUP_ANCHOR): the two anchors are the "same path" evidence for the mainland
+// and the outside, and they carry their own group in from net.mjs, where their addresses come from the page's meta.
+// STUN is UDP-only evidence; everything else is a web check. Used when a page wants core's pathOf(); trace's own
+// verdict never equates a path with "direct".
+const groupOf = (by) => (by === 'WebRTC' ? 'udp' : 'web');
 const fam6 = (x) => x.includes(':');
 export function groupExits(seen, geo, zh = {}) {
   const geoOf = (ip) => geo[ip] || geo[Object.keys(geo).find((x) => fam6(x) === fam6(ip) && netOf(x) === netOf(ip))] || null;
   // core groups by answer, so every answer gets an index of its own; `by` is what the page shows as "seen by".
   const answers = [];
-  for (const { ip, by } of seen) {
+  for (const { ip, by, group } of seen) {
     const g0 = geoOf(ip); if (!g0) continue;   // shown once its network is known, so it never splits off and merges back
-    answers.push({ idx: answers.length, id: String(answers.length), group: groupOf(by), by, ip, geo: g0, asn: g0.asn, org: g0.org });
+    answers.push({ idx: answers.length, id: String(answers.length), group: group || groupOf(by), by, ip, geo: g0, asn: g0.asn, org: g0.org });
   }
   const byIdx = new Map(answers.map((a) => [a.idx, a]));
   const G = coreGroupExits(answers).map((e) => {

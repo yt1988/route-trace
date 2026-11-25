@@ -1,4 +1,7 @@
-// The Route Trace Worker. Files in ./public are served before it runs, so it only sees paths that are not files:
+// The Route Trace Worker. Files in ./public are served before it runs, except the pages wrangler.toml lists in
+// assets.run_worker_first, which pass through it so it can add the measurement points from the environment:
+//   HTML pages                    with <meta name="ms-anchors"> (our own probes) when the site set the env; without
+//                                 it the page asks only the public services
 //   /r/<code>, /<lang>/r/<code>   a shared trace: that language's page with what was traced and its numbers in the
 //                                 title and description (what chat apps show as the link's preview), not indexed; the
 //                                 page itself reads the code and draws the trace (src/code.mjs)
@@ -23,6 +26,30 @@ import ru from './i18n/ru.mjs';
 const STR = { '': [en, 'en'], 'zh-cn': [zhCN, 'zh-CN'], 'zh-tw': [zhTW, 'zh-TW'], ja: [ja, 'ja'], ko: [ko, 'ko'], es: [es, 'es'], fr: [fr, 'fr'], de: [de, 'de'], pt: [pt, 'pt'], ru: [ru, 'ru'] };
 const fill = (s, v) => s.replace(/\{(\w+)\}/g, (m, k) => (k in v ? v[k] : m));
 
+// The addresses of our own probes are deploy-time data (tool-contract §2), never repository content: the site sets
+// the Worker's MS_* variables and the page reads them from <meta>. Nothing set → no meta, and the page leaves those
+// probes out instead of falling back to someone else's service.
+const ENDPOINTS = [['ms-anchors', 'MS_ANCHORS'], ['ms-egress', 'MS_EGRESS']];
+const escAttr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+export function endpointTags(env = {}) {
+  return ENDPOINTS.filter(([, key]) => env[key]).map(([name, key]) => [name, String(env[key])]);
+}
+// The page is the file with the metas added, so its ETag has to cover both: otherwise a visitor who loaded it before
+// MS_* was set would revalidate against the untouched file, get 304, and keep a page without the probes. The tag is a
+// hash of the page as it was served plus the metas, and an equal tag answers 304 without a body.
+const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return (h >>> 0).toString(36); };
+export const pageETag = (html, tags) => (html == null ? null : `"${hash(html + "\n" + tags.map(([n, v]) => `${n}=${v}`).join("\n"))}"`);
+function withEndpoints(rw, env) {
+  const tags = endpointTags(env);
+  if (!tags.length) return rw;
+  return rw.on('head', { element: (e) => { for (const [name, value] of tags) e.append(`<meta name="${name}" content="${escAttr(value)}">`, { html: true }); } });
+}
+const notFound = (req) => new Response(req.method === 'HEAD' ? null : 'Not found\n', {
+  status: 404,
+  headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=0, must-revalidate' },
+});
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
@@ -30,10 +57,24 @@ export default {
     const sp = sharePath(url.pathname);
     const o = sp && STR[sp.slug] && env.ASSETS ? await decodeResult(sp.code).catch(() => null) : null;
     if (o) return shared(req, env, url, sp.slug, o);
-    return new Response(req.method === 'HEAD' ? null : 'Not found\n', {
-      status: 404,
-      headers: { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'public, max-age=0, must-revalidate' },
-    });
+    if (!env.ASSETS) return notFound(req);
+    const tags = endpointTags(env);
+    // The page is fetched without the caller's conditional headers: their If-None-Match may be the file's own tag from
+    // before the probes were set, and a 304 for that would keep a page the probes never reached. We answer 304 below.
+    const clean = new Headers(req.headers);
+    clean.delete('if-none-match');
+    clean.delete('if-modified-since');
+    const page = await env.ASSETS.fetch(new Request(req.url, { method: req.method, headers: clean }));
+    const html = (page.headers.get('content-type') || '').includes('text/html');
+    if (!tags.length || page.status !== 200 || !html || req.method === 'HEAD') return page;
+    const body = await page.text();
+    const etag = pageETag(body, tags);
+    if (req.headers.get('if-none-match') === etag) return new Response(null, { status: 304, headers: { etag, 'cache-control': 'no-cache' } });
+    const out = withEndpoints(new HTMLRewriter(), env).transform(new Response(body, { headers: { 'content-type': 'text/html; charset=utf-8' } }));
+    const h = new Headers(page.headers);
+    h.delete('content-length');
+    h.set('etag', etag);
+    return new Response(out.body, { status: 200, headers: h });
   },
 };
 
@@ -61,7 +102,7 @@ async function shared(req, env, url, slug, o) {
   const page = await env.ASSETS.fetch(new Request(new URL(home, url), { headers: req.headers }));
   if (!page.ok) return page;
   const attr = (val, name = 'content') => ({ element: (e) => e.setAttribute(name, val) });
-  const out = new HTMLRewriter()
+  const out = withEndpoints(new HTMLRewriter(), env)
     .on('title', { element: (e) => e.setInnerContent(title) })
     .on('meta[name="description"]', attr(desc))
     .on('meta[property="og:title"]', attr(title)).on('meta[name="twitter:title"]', attr(title))
