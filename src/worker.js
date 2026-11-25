@@ -59,14 +59,16 @@ export default {
     if (o) return shared(req, env, url, sp.slug, o);
     if (!env.ASSETS) return notFound(req);
     const tags = endpointTags(env);
-    // The page is fetched without the caller's conditional headers: their If-None-Match may be the file's own tag from
-    // before the probes were set, and a 304 for that would keep a page the probes never reached. We answer 304 below.
+    // Without probes the page is the file itself, so the asset's own conditional handling is the right one.
+    if (!tags.length) return env.ASSETS.fetch(req);
+    // With probes the page is fetched without the caller's conditional headers: their If-None-Match may be the file's
+    // own tag from before the probes were set, and a 304 for that would keep a page the probes never reached.
     const clean = new Headers(req.headers);
     clean.delete('if-none-match');
     clean.delete('if-modified-since');
     const page = await env.ASSETS.fetch(new Request(req.url, { method: req.method, headers: clean }));
     const html = (page.headers.get('content-type') || '').includes('text/html');
-    if (!tags.length || page.status !== 200 || !html || req.method === 'HEAD') return page;
+    if (page.status !== 200 || !html || req.method === 'HEAD') return page;
     const body = await page.text();
     const etag = pageETag(body, tags);
     if (req.headers.get('if-none-match') === etag) return new Response(null, { status: 304, headers: { etag, 'cache-control': 'no-cache' } });
