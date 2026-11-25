@@ -65,7 +65,8 @@ npm run dev        # wrangler dev，打开 http://localhost:8807
 由 1ms.dog 的 shell 在代理页面、改写 `<head>` 时统一写入（值放在 shell 的 Worker 变量里，CSP 的 `connect-src`
 也由它按注入值补）；页面用 `src/egress.js` 的 `readAnchors()` 读。
 
-- 自部署、本地构建和 CI 都没有这个 meta：两个探针的请求不发，出口仍由公开服务判定，界面不报错。
+- 探针要求短时令牌：请求带页面的 `<meta name="ms-auth">` 值；快过期或收到 401 时向 shell 的 `/_ms/token` 换一次并重试一次，拿不到就按「不可用」降级。
+- 自部署、本地构建和 CI 都没有这些 meta：两个探针的请求不发，出口仍由公开服务判定，界面不报错。
 - 本仓库不写端点地址，也不要为了注入在 Worker 里加 HTMLRewriter、ASSETS binding 或 `run_worker_first`。
 - 端点格式或新增端点由全站的注入契约决定，先按它改，再改这里和 `src/net.mjs`。
 

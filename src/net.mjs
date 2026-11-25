@@ -142,11 +142,57 @@ export function anchorSources(a = readAnchors()) {
 }
 const SOURCES = anchorSources();
 const ANCHORS = new Set(SOURCES.map((s) => s.label));
+
+// Our probes take a short-lived token the shell signs into the page (tool-contract "端点鉴权"): send it as a bearer
+// header, and when it is about to expire or a request says 401, ask /_ms/token for a fresh one and retry once. A page
+// without the meta (self-hosted, or the site has no secret yet) sends no header; one failed refresh is "unavailable",
+// never a loop.
+const AUTH_META = 'ms-auth';
+export function authToken(doc = globalThis.document) {
+  const el = doc && doc.querySelector ? doc.querySelector(`meta[name="${AUTH_META}"]`) : null;
+  return (el && el.getAttribute('content')) || '';
+}
+const expOf = (token) => { const m = /^v1\.(\d+)\./.exec(token || ''); return m ? +m[1] * 1000 : 0; };
+const setAuthToken = (value, doc) => {
+  const el = doc && doc.querySelector ? doc.querySelector(`meta[name="${AUTH_META}"]`) : null;
+  if (el) el.setAttribute('content', value);
+};
+let refreshing = null;
+export function refreshToken({ fetchImpl = fetch, doc = globalThis.document } = {}) {
+  refreshing ||= (async () => {
+    try {
+      const r = await fetchImpl('/_ms/token', { cache: 'no-store', credentials: 'same-origin', signal: AbortSignal.timeout(4000) });
+      const j = await r.json().catch(() => null);
+      const token = r.ok && j && typeof j.token === 'string' ? j.token : '';
+      if (token) setAuthToken(token, doc);
+      return token;
+    } catch { return ''; } finally { refreshing = null; }
+  })();
+  return refreshing;
+}
+// One anchor answer. The token is read per request (the meta changes when it is refreshed), and exactly one retry
+// follows a 401; anything else that fails is simply unavailable to this page.
+export async function anchorJson(url, { ms = 4000, fetchImpl = fetch, doc = globalThis.document, now = Date.now } = {}) {
+  const send = (token) => fetchImpl(bust(url), {
+    cache: 'no-store', credentials: 'omit',
+    headers: token ? { authorization: `Bearer ${token}` } : {},
+    signal: AbortSignal.timeout(ms),
+  });
+  let token = authToken(doc);
+  if (token && expOf(token) - now() < 60000) token = await refreshToken({ fetchImpl, doc });
+  let r = await send(token);
+  if (r.status === 401) {
+    const fresh = await refreshToken({ fetchImpl, doc });
+    if (fresh) r = await send(fresh);
+  }
+  if (!r.ok) { const e = new Error('HTTP ' + r.status); e.status = r.status; throw e; }
+  return r.json();
+}
 // q: how much a source's city and coordinates are trusted (Cloudflare's own view of the connection beats the rest)
 const CHECKS = [
   // The two anchors (docs/egress-contract.md §1): our own probes, not proxied and in no split-tunnel list, so they say
   // which path an exit takes — a mainland destination and an outside one. Same answer shape as the rest: the address.
-  ...SOURCES.map((s) => [s.label, s.group, () => getJ(s.url, 4000).then((j) => ({ ip: j.ip }))]),
+  ...SOURCES.map((s) => [s.label, s.group, () => anchorJson(s.url).then((j) => ({ ip: j.ip }))]),
   ['1ms.dog', 'web', () => fetch('/_ms/me', { cache: 'no-store', signal: AbortSignal.timeout(3000) }).then((r) => (r.ok ? r.json() : Promise.reject()))
     .then((j) => (j.ip ? { ip: j.ip, geo: { cc: j.country, city: j.city, region: j.region, asn: j.asn, org: j.org, lat: num(j.latitude), lon: num(j.longitude), q: 3 } } : Promise.reject()))],
   ['ipip.net', 'web', () => getJ('https://myip.ipip.net/json').then((j) => ({ ip: j.data.ip, zh: j.data.location }))],
