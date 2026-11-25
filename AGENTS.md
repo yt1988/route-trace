@@ -61,13 +61,13 @@ npm run dev        # wrangler dev，打开 http://localhost:8807
 
 ## 测量端点（部署注入）
 
-自己探针的地址是部署数据，不写进仓库，也不进构建产物：Worker 从 `env.MS_ANCHORS` 读，用 `HTMLRewriter` 写进每个页面的
-`<meta name="ms-anchors" content="cn=…;intl=…">`，页面用 `src/egress.js` 的 `readAnchors()` 读。
+自己探针的地址是部署数据，不写进仓库，也不进构建产物：页面上有一个 `<meta name="ms-anchors" content="cn=…;intl=…">`，
+由 1ms.dog 的 shell 在代理页面、改写 `<head>` 时统一写入（值放在 shell 的 Worker 变量里，CSP 的 `connect-src`
+也由它按注入值补）；页面用 `src/egress.js` 的 `readAnchors()` 读。
 
-- 设置：`npx wrangler secret put MS_ANCHORS --name route-trace`，值是完整 URL，两个键用 `;` 分隔。
-- 仓库、本地构建和 CI 里默认为空：页面没有这个 meta，两个探针的请求不发，出口仍由公开服务判定，界面不报错。
-- `wrangler.toml` 的 `assets.run_worker_first` 让 HTML 页面经过 Worker 注入，其他文件仍由静态资源直接提供。
-- 网页改端点格式或新增端点时，先按全站的注入契约改，再改这里和 `src/worker.js`。
+- 自部署、本地构建和 CI 都没有这个 meta：两个探针的请求不发，出口仍由公开服务判定，界面不报错。
+- 本仓库不写端点地址，也不要为了注入在 Worker 里加 HTMLRewriter、ASSETS binding 或 `run_worker_first`。
+- 端点格式或新增端点由全站的注入契约决定，先按它改，再改这里和 `src/net.mjs`。
 
 ## 约定
 
