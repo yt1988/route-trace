@@ -31,7 +31,9 @@ const segName = (s) => (s.name.local ? t('seg_local') : s.name.line ? lineName(s
 // none, so nothing shows (tool-contract §4).
 const tool = (id) => document.querySelector(`meta[name="${id}"]`)?.content?.replace(/\/$/, '') || null;
 const langDir = () => { const l = document.documentElement.lang.toLowerCase(); return l === 'en' ? '/' : `/${l}/`; };
-const EXT = '<svg class="ext-i" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg>';
+// xmlns is needed on every runtime-built svg: Dark Reader serialises an <svg> with outerHTML and reloads it as
+// data:image/svg+xml, and the namespace is not an attribute, so an svg without it fails to decode (#146).
+const EXT = '<svg class="ext-i" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5 7.5 8.5M12 10v3.5H2.5V4H6"/></svg>';
 // an AS number as data: a dotted link to ASN lookup when that tool is there, plain text otherwise
 const asLink = (asn) => { const b = tool('asn'); return asn ? (b ? `<a class="data" href="${b}${langDir()}AS${asn}" target="_blank" rel="noopener" title="${esc(t('asn_title', { asn }))}">AS${asn}</a>` : `AS${asn}`) : ''; };
 const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
@@ -448,7 +450,7 @@ $('#pkList').addEventListener('click', (e) => { const b = e.target.closest('.pk-
 // the path card's first line: direction, from which probe, to what; the two next steps once there is a result
 function pathHead(dir, s, target, acts) {
   return `<div class="path-h"><span class="pill">${esc(t(dir === 'out' ? 'dir_out' : 'dir_back'))}</span><span class="ctx">${esc(t('probe_of', { city: city(s.city), net: shortOrg(s.network, s.asn) }))} → <b>${esc(target)}</b></span>`
-    + (acts ? `<span class="path-acts"><button type="button" id="shareBtn" class="pri"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.5V2M5 4.8 8 2l3 2.8M3.5 8.5v5h9v-5"/></svg>${esc(t('share'))}</button>${S.last?.shared ? '' : `<button type="button" id="again">${esc(t('again'))}</button>`}<button type="button" id="flip">${esc(t(dir === 'out' ? 'flip_out' : 'flip_back'))}</button></span>` : '') + '</div>';
+    + (acts ? `<span class="path-acts"><button type="button" id="shareBtn" class="pri"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.5V2M5 4.8 8 2l3 2.8M3.5 8.5v5h9v-5"/></svg>${esc(t('share'))}</button>${S.last?.shared ? '' : `<button type="button" id="again">${esc(t('again'))}</button>`}<button type="button" id="flip">${esc(t(dir === 'out' ? 'flip_out' : 'flip_back'))}</button></span>` : '') + '</div>';
 }
 async function run(opts = {}) {
   if (S.running || !S.origin) return;
