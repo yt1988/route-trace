@@ -697,7 +697,7 @@ function litStop(id, on) {
 }
 
 // ---------- sharing (the 1ms.dog share component, copied verbatim to /assets/share/) ----------
-const SHARE = '/assets/share/share.js?v=10';
+const SHARE = '/assets/share/share.js?v=11';
 let banner = null;
 // A return trace's target is usually the visitor's own address, or a name that points at it (a home DDNS name). The
 // share dialog's box (unticked every time it opens) decides whether the card and the link show it; unticked, both keep
@@ -741,7 +741,9 @@ function cardLayout(ctx, kit) {
 }
 async function shareResult() {
   const a = S.last.a, links = { false: await resultLink(false), true: ownIp() ? await resultLink(true) : null };
-  const { share } = await import(SHARE);
+  const shareMod = await import(SHARE).catch(() => null);
+  if (!shareMod) { window.msShareDown && window.msShareDown(); return; }
+  const { share } = shareMod;
   share({
     lang: LANG, name: t('app_name'), file: 'route-trace', show: ownIp() ? ['ip'] : [], never: ownIp() ? [] : ['ip'],
     link: (show) => links[!!(show && ownIp())], home: location.origin + (PATHS[LANG] || '/'),
