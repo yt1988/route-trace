@@ -709,7 +709,12 @@ async function renderResult() {
     const y = yOf(A) + (yOf(B) - yOf(A)) * e;
     comet.style.opacity = ''; comet.style.transform = `translateY(${y}px)`;
   };
-  globe.showRoute(stops, legs, [34, 56, 24, 40], { animate: true, onReach, onTick });
+  globe.showRoute(stops, legs, [34, 56, 24, 40], {
+    animate: true, onReach, onTick,
+    // the countries the path visits carry their names; the one it hands over to says so
+    countryLabel: country, countryEnter: (name) => t('map_border', { country: name }),
+    legend: [['lat', esc(t('map_legend_lat'))], ['dash', esc(t('map_legend_dash'))]],
+  });
   $('#result .tl').addEventListener('mouseover', (e) => { const row = e.target.closest('[data-n]'); if (row) globe.highlight([hopStop.get(+row.dataset.n)], true); });
   $('#result .tl').addEventListener('mouseout', () => globe.highlight([], false));
 }
@@ -772,7 +777,7 @@ function timeline(a, target, live) {
 function mapModel(a) {
   hopStop = new Map();
   const stops = [], o = a.origin;
-  const origin = { id: 'o', kind: 'origin', lat: o.lat, lon: o.lon, label: city(o.city), floor: 0, hops: [], tip: `<b>${esc(t('origin_tip', { city: city(o.city) }))}</b><br>${esc(t('origin_sub'))}` };
+  const origin = { id: 'o', kind: 'origin', lat: o.lat, lon: o.lon, cc: o.cc, label: city(o.city), floor: 0, hops: [], tip: `<b>${esc(t('origin_tip', { city: city(o.city) }))}</b><br>${esc(t('origin_sub'))}` };
   stops.push(origin);
   for (const h of a.path) {
     if (h.loc?.src === 'local') { hopStop.set(h.n, 'o'); origin.hops.push(h.n); continue; }
@@ -788,7 +793,7 @@ function mapModel(a) {
     if (weak && !fits(stops[stops.length - 1])) continue;
     const prev = stops[stops.length - 1];
     if (L.km(prev, h.loc) < 40) { prev.hops.push(h.n); prev.floorEnd = h.floor; hopStop.set(h.n, prev.id); if (!weak) { prev.weak = false; prev.label = prev.label.replace(/\?$/, ''); } continue; }
-    const s = { id: String(h.n), kind: 'hop', weak, lat: h.loc.lat, lon: h.loc.lon, label: (city(h.loc.city) || '') + (weak ? '?' : ''), floor: h.floor, floorEnd: h.floor, hops: [h.n], line: h.line ? lineName(h.line) : h.org };
+    const s = { id: String(h.n), kind: 'hop', weak, lat: h.loc.lat, lon: h.loc.lon, cc: h.loc.cc, label: (city(h.loc.city) || '') + (weak ? '?' : ''), floor: h.floor, floorEnd: h.floor, hops: [h.n], line: h.line ? lineName(h.line) : h.org };
     stops.push(s); hopStop.set(h.n, s.id);
   }
   // hops with no place on the map belong to the next stop that has one (the line reaches them on the way there)
@@ -806,13 +811,26 @@ function mapModel(a) {
     const add = Math.max(0, (B.floorEnd ?? B.floor ?? 0) - (A.floorEnd ?? A.floor ?? 0));
     legs.push({ a: A, b: B, ms: add, tier: tierOf(add), dashed: A.weak || B.weak || B.hops[0] - (A.hops[A.hops.length - 1] || 0) > 1 });
   }
+  // what a leg is: which network it runs on (the far stop names it), what it adds, how far it is, which country it
+  // hands over to — the timeline says the same in words, the map answers it where the eye already is. Built on hover:
+  // the map fills in a country from where a stop lands, which a stop placed by its router name does not have yet.
+  for (const l of legs) {
+    l.tip = () => {
+      const from = country(l.a.cc), to = country(l.b.cc);
+      return `<b>${esc(l.a.label || '')} → ${esc(l.b.label || '')}</b>`
+        + (l.b.line ? `<br>${esc(l.b.line)}` : '')
+        + `<br>+${Math.round(l.ms)} ms · ${num(L.km(l.a, l.b))} km`
+        + (from && to && from !== to ? `<br>${esc(from)} → ${esc(to)}` : '');
+    };
+  }
   return { stops, legs };
 }
-function litStop(id, on) {
-  const rows = stopRows.get(id) || [];
-  rows.forEach((r) => r.classList.toggle('lit', !!on && on !== 'click'));
-  if (on === 'click' && rows[0]) rows[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
-  globe.highlight(on ? [id] : [], !!on);
+// a dot can stand for several hops in the same place: every one of them lights, and a click goes to the first
+function litStop(ids, on) {
+  const list = [].concat(ids);
+  for (const id of list) (stopRows.get(id) || []).forEach((r) => r.classList.toggle('lit', !!on && on !== 'click'));
+  if (on === 'click') list.map((id) => (stopRows.get(id) || [])[0]).find(Boolean)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  globe.highlight(on ? list : [], !!on);
 }
 
 // ---------- sharing (the 1ms.dog share component, copied verbatim to /assets/share/) ----------

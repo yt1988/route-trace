@@ -200,10 +200,21 @@ a.data { color: inherit; text-decoration: underline dotted; text-underline-offse
 .map .stop.me { fill: var(--up); } .map .stop.exit { fill: var(--warn); } .map .stop.probe { fill: var(--ink); }
 .map .stop.lit { fill: var(--ink); stroke: var(--ink); }
 .map .labels text { fill: var(--fg); paint-order: stroke; stroke: var(--map-land); font-weight: 600; pointer-events: none; transition: opacity .3s; }
+/* a country the route passes through, named where it does not crowd a stop; and a count where several stops share a dot */
+.map .labels text.clabel { fill: var(--muted); font-size: 11px; letter-spacing: .03em; }
+.map .labels text.more { fill: var(--muted); font-size: 11px; pointer-events: auto; cursor: zoom-in; }
+.map .exit-ring { fill: none; stroke: var(--warn); stroke-width: 1.4; stroke-dasharray: 2.5 3; opacity: .85; pointer-events: none; }
+/* what the colours and dashes mean, quiet enough to ignore once learned */
+.map-legend { position: absolute; left: 10px; bottom: 10px; display: flex; flex-direction: column; gap: 3px; max-width: calc(100% - 72px); padding: 5px 8px; border-radius: 8px; border: 1px solid var(--line); background: color-mix(in srgb, var(--panel) 88%, transparent); color: var(--muted); font-size: 11px; line-height: 1.3; pointer-events: none; }
+.map-legend[hidden] { display: none; }
+.map-legend .lg { display: flex; align-items: center; gap: 6px; }
+.map-legend .sw { flex: none; width: 18px; height: 3px; border-radius: 2px; }
+.map-legend .sw.lat { background: linear-gradient(90deg, var(--t1), var(--t3), var(--t5)); }
+.map-legend .sw.dash { background: repeating-linear-gradient(90deg, var(--muted) 0 4px, transparent 4px 8px); }
 .map .probe { fill: var(--muted); opacity: .35; cursor: pointer; }
 .map .probe.eye { fill: var(--up); } .map .probe.hot { opacity: .95; }
 .map .probe.sel { fill: var(--ink); opacity: 1; stroke: var(--panel); }
-.map-tip { position: absolute; pointer-events: none; transform: translate(-50%, calc(-100% - 12px)); background: var(--fg); color: var(--bg); padding: 6px 9px; border-radius: 8px; font-size: 12px; line-height: 1.4; white-space: nowrap; z-index: 2; }
+.map-tip { position: absolute; pointer-events: none; transform: translate(-50%, calc(-100% - 12px)); background: var(--fg); color: var(--bg); padding: 6px 9px; border-radius: 8px; font-size: 12px; line-height: 1.4; white-space: normal; max-width: min(320px, calc(100% - 16px)); z-index: 2; }
 .map-ctl { position: absolute; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 4px; }
 .map-ctl button { width: 34px; height: 34px; border: 1px solid var(--line); background: var(--panel); border-radius: 8px; cursor: pointer; font-size: 16px; line-height: 1; }
 

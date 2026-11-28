@@ -375,7 +375,8 @@ export function analyze(hops, probe, geo = new Map()) {
     if (kind === 'private' || kind === 'cgnat') loc = { ...origin, src: 'local' };
     else if (ip) {
       const hint = (g?.src === 'ix' && g.lat != null ? g : null) || hostnameHint(h.resolvedHostname);
-      loc = hint || (g?.lat != null ? g : null);
+      // a router name places the hop more precisely than a database's city, but the database still knows its country
+      loc = hint ? { ...hint, cc: hint.cc || g?.cc || null } : (g?.lat != null ? g : null);
       // For an unannounced address, a geo database only knows where the block is registered (China Unicom Global's
       // links are registered in Hong Kong, wherever the router stands), so that place is a guess, not a city
       if (!hint && loc && !bgp && loc.src === 'city') loc = { ...loc, src: 'registry' };
