@@ -58,10 +58,16 @@ export function createMap(el, { onStop, onCity, labels = { in: '+', out: '−', 
     gDots.selectAll('circle').attr('r', function () { return +this.dataset.r / Math.sqrt(k); }).attr('stroke-width', 1.5 / k);
     gLabels.selectAll('text').attr('font-size', function () { return (this.classList.contains('clabel') ? 11 : 12) / k; }).attr('stroke-width', 3 / k);
     gLabels.selectAll('text').attr('display', function () {
-      const floor = this.classList.contains('more') || this.classList.contains('absorbed') ? SPLIT : 0;
-      return k >= Math.max(+this.dataset.min || 0, floor) ? null : 'none';
+      // the count belongs to the merged dot and goes away once zooming pulls its dots apart; an absorbed name is the
+      // other way round. Each cluster knows the zoom at which its own dots clear each other.
+      if (this.classList.contains('more')) return k < (+this.dataset.max || SPLIT) ? null : 'none';
+      return k >= (+this.dataset.min || 0) ? null : 'none';
     });
-    gDots.selectAll('circle.absorbed').attr('display', k >= SPLIT ? null : 'none');
+    // an absorbed dot shows once its cluster's dots are far enough apart to read
+    gDots.selectAll('circle.absorbed').attr('display', function () { return k >= (+this.dataset.min || SPLIT) ? null : 'none'; });
+    // a name sits a fixed distance above its dot however far the map is zoomed (the gap is in map units, which the
+    // zoom scales), and names that come out of one cluster step up one by one instead of writing over each other
+    gLabels.selectAll('text.place').attr('dy', function () { return -(10 + 13 * (+this.dataset.i || 0)) / k; });
   }
   function project(pts, legs = [], pad = [34, 40, 24, 40]) {
     const [w, h] = size(); svg.attr('viewBox', `0 0 ${w} ${h}`);
@@ -119,19 +125,21 @@ export function createMap(el, { onStop, onCity, labels = { in: '+', out: '−', 
     gLegs.selectAll('*').remove(); gDots.selectAll('*').remove(); gLabels.selectAll('*').remove();
     if (state.mode === 'route') {
       const at = new Map(state.stops.map((s) => [s.id, projection([s.lon, s.lat])]));
-      // A stop's place on the map names its country when nothing else did: a router name places a hop precisely but
-      // carries no country, and the geo database may not know the address. The same lookup names the countries the
-      // path passes through below.
+      // Where a stop is drawn decides which country the map calls it: the position may come from a router name while
+      // the country came from a database that only knows where the block is registered (a CDN node in Osaka whose
+      // address is registered in London). The database's answer is used only when the position is not on land at all.
+      // A router name also places a hop with no country at all, which this fills in.
       const ccs = new Map();
       const ccAt = (s) => {
         if (!ccs.has(s.id)) {
-          let cc = s.cc;
-          if (!cc && world) {
+          let cc = null;
+          if (world) {
             const f = world.countries.features.find((c) => d3.geoContains(c, [s.lon, s.lat]));
             cc = (f && CC[f.id]) || null;
           }
+          if (!cc) cc = s.cc || null;
           ccs.set(s.id, cc);
-          if (cc && !s.cc) s.cc = cc;
+          if (cc) s.cc = cc;
         }
         return ccs.get(s.id);
       };
@@ -159,6 +167,9 @@ export function createMap(el, { onStop, onCity, labels = { in: '+', out: '−', 
       for (const g0 of groups) {
         const all = [g0.keep, ...g0.more].sort((a, b) => ((RANK[a.kind] ?? 3) - (RANK[b.kind] ?? 3)) || ((b.exit ? 1 : 0) - (a.exit ? 1 : 0)));
         g0.keep = all[0]; g0.more = all.slice(1);
+        // how far the cluster spreads, in fitted pixels: the zoom at which it has come apart depends on that
+        g0.r = Math.max(0, ...g0.more.map((s) => { const [x, y] = at.get(s.id); return Math.hypot(x - g0.x, y - g0.y); }));
+        g0.split = Math.min(40, Math.max(SPLIT, MERGE / Math.max(0.5, g0.r)));
       }
       const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
       for (const g0 of groups) {
@@ -171,7 +182,7 @@ export function createMap(el, { onStop, onCity, labels = { in: '+', out: '−', 
         for (const s of [g0.keep, ...g0.more]) {
           const [x, y] = at.get(s.id), absorbed = s !== g0.keep;
           gDots.append('circle').attr('class', `stop ${s.kind}${s.weak ? ' weak' : ''}${absorbed ? ' absorbed' : ''}`).attr('cx', x).attr('cy', y)
-            .attr('data-r', s.kind === 'hop' ? 4.5 : 6.5).attr('data-id', s.id).attr('data-ids', ids.join(' '))
+            .attr('data-r', s.kind === 'hop' ? 4.5 : 6.5).attr('data-id', s.id).attr('data-ids', ids.join(' ')).attr('data-min', absorbed ? g0.split : 0)
             .on('mouseenter', (e) => { onStop?.(ids, true); const r = el.getBoundingClientRect(); showTip(s.tip, e.clientX - r.left, e.clientY - r.top); })
             .on('mouseleave', () => { onStop?.(ids, false); hideTip(); })
             .on('click', () => onStop?.(ids, 'click'));
@@ -179,14 +190,16 @@ export function createMap(el, { onStop, onCity, labels = { in: '+', out: '−', 
         for (const s of [g0.keep, ...g0.more]) if (s.label) {
           const [x, y] = at.get(s.id);
           gLabels.append('text').attr('class', `place${s === g0.keep ? '' : ' absorbed'}`).attr('x', x).attr('y', y).attr('dy', -10).attr('text-anchor', 'middle')
-            .attr('data-min', s.kind === 'hop' ? 2.5 : 0).attr('data-id', s.id).text(s.label);
+            .attr('data-min', Math.max(s.kind === 'hop' ? 2.5 : 0, s === g0.keep ? 0 : g0.split)).attr('data-i', s === g0.keep ? 0 : g0.more.indexOf(s) + 1)
+            .attr('data-id', s.id).text(s.label);
         }
         if (g0.more.length) {
           gLabels.append('text').attr('class', 'more').attr('x', g0.x + 7).attr('y', g0.y + 5).attr('text-anchor', 'start')
-            .attr('data-min', 0).attr('data-id', g0.keep.id).text('+' + g0.more.length)
+            .attr('data-max', g0.split).attr('data-id', g0.keep.id).text('+' + g0.more.length)
             .on('mouseenter', (e) => { const r = el.getBoundingClientRect(); showTip(`<b>+${g0.more.length}</b><br>${g0.more.map((s) => esc(s.label || '')).join(' · ')}`, e.clientX - r.left, e.clientY - r.top); })
             .on('mouseleave', hideTip)
-            .on('click', () => svg.transition().duration(250).call(zoom.scaleBy, 3, [g0.x, g0.y]));
+            // zoom until this cluster's own dots clear each other, keeping it under the cursor wherever the view is now
+            .on('click', () => svg.transition().duration(250).call(zoom.scaleBy, Math.min(40, Math.max(3, g0.split * 1.15)), d3.zoomTransform(svg.node()).apply([g0.x, g0.y])));
         }
       }
       // Which countries the path passes through, named at each country's centre where that does not sit on a stop's
