@@ -73,6 +73,9 @@ select option, select optgroup { background-color: var(--panel); color: var(--fg
 .tier.g2 { background: color-mix(in srgb, var(--t2) 16%, transparent); color: var(--t2); }
 .tier.g1 { background: var(--warn-soft); color: var(--warn); }
 .tier.g0 { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }
+/* which address family the target has: a name that resolves to one family only leaves no IP choice to make */
+.fam { font-size: 11px; padding: 1px 7px; border-radius: 99px; background: var(--soft); color: var(--muted); font-weight: 600; white-space: nowrap; }
+.fam[hidden] { display: none; }
 .to-box { min-height: 58px; display: flex; }
 #target { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 12px; padding: 0 12px; font: 16px var(--f-num); }
 #target:focus { outline: 2px solid var(--ink); outline-offset: -1px; }
@@ -236,6 +239,9 @@ html.dlg-lock, html.dlg-lock body { overflow: hidden; }
 .pk-row .t.dc { background: var(--soft); color: var(--muted); }
 .pk-main { min-width: 0; line-height: 1.35; } .pk-net { font-size: 13px; } .pk-main .m { font-size: 12px; }
 .pk-side { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 12px; }
+/* what a run here has shown about the slot's IPv6 reach; an unmarked slot has not been tried */
+.pk-side .cap { font-size: 11px; padding: 1px 7px; border-radius: 99px; background: var(--soft); color: var(--muted); font-weight: 600; white-space: nowrap; }
+.pk-side .cap.on { background: color-mix(in srgb, var(--t2) 16%, transparent); color: var(--t2); }
 .pk-empty { padding: 20px 8px; }
 .pk-foot { font-size: 12px; padding: 8px 12px; border-top: 1px solid var(--line); }
 
@@ -267,6 +273,9 @@ main { display: flex; flex-direction: column; gap: 20px; }
 .path-sum b { font: 700 20px var(--f-num); color: var(--fg); }
 .path-sum .bad b, .path-sum.bad { color: var(--bad); } .path-sum .warn b { color: var(--warn); }
 .path-sum.m b { font-size: inherit; }
+/* the one action a failed run offers (pick a probe that can reach an IPv6 target) sits in the sentence itself */
+.path-sum button.pri { font: inherit; color: var(--ink); background: none; border: 0; border-bottom: 1px solid currentColor; padding: 0 0 1px; cursor: pointer; }
+.path-sum button.pri:hover { color: var(--fg); }
 
 /* ---------- help: list left, one answer right; select with previous / next on phones ---------- */
 .help { width: min(820px, calc(100vw - 24px)); }

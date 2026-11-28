@@ -230,6 +230,30 @@ export function rankSlots(slots, me) {
   return slots.map((s) => ({ s, m: matchSlot(s, me) })).sort((a, b) => b.m.score - a.m.score);
 }
 
+// A probe can only run a test whose target family it can reach, and Globalping keeps that to itself: it drops the
+// probes that cannot reach the target's family before it looks at the locations. A location with none left is skipped,
+// not an error, and the first location that has one provides the probe. So for an IPv6 target the *order of the list*
+// is the choice: slots we have already seen carry IPv6 first, then the rest by distance, and the country as a last
+// resort. `capOf(slotKey)` answers 'v6' (seen working), 'v4' (seen failing, skip it) or null (never tried).
+export function v6Plan(slots, ref, capOf = () => null, { limit = 24 } = {}) {
+  const yes = [], any = [];
+  for (const s of slots) {
+    const c = capOf(s.key);
+    if (c === 'v4') continue;
+    (c === 'v6' ? yes : any).push({ s, km: km(s, ref) });
+  }
+  const near = (a, b) => a.km - b.km;
+  yes.sort(near); any.sort(near);
+  return [...yes, ...any].slice(0, limit);
+}
+// The ordered list handed to Globalping: no per-location `limit` (that would run one probe in every location), the
+// country last so a target far from any city we know still gets a probe.
+export function v6Locations(plan, cc) {
+  const out = plan.map(({ s }) => ({ country: s.cc, city: s.city, asn: s.asn, tags: [s.eyeball ? 'eyeball-network' : 'datacenter-network'] }));
+  if (cc) out.push({ country: cc });
+  return out;
+}
+
 // ---------- search ----------
 export const CITY_ZH = {
   Beijing: '北京', Shanghai: '上海', Guangzhou: '广州', Shenzhen: '深圳', Hangzhou: '杭州', Nanjing: '南京', Chengdu: '成都',

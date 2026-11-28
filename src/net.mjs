@@ -18,17 +18,20 @@ export async function getLimits() {
   try { return (await json(GP + '/limits')).rateLimit?.measurements?.create || null; } catch { return null; }
 }
 
-// One MTR from one probe. `from` is a location object, or the id of an earlier measurement to reuse its exact probe.
+// One MTR from one probe. `from` is a location object, an ordered array of them (one probe, taken from the first
+// location that has one), or the id of an earlier measurement to reuse its exact probe.
 export async function startMtr({ target, from, packets = 10, protocol = 'ICMP', port = 443, ipVersion }) {
   const measurementOptions = { packets, protocol };
   if (protocol !== 'ICMP') measurementOptions.port = port;
   if (ipVersion && !/^[\d.]+$|:/.test(target)) measurementOptions.ipVersion = ipVersion;
-  const body = { type: 'mtr', target, inProgressUpdates: true, measurementOptions, locations: typeof from === 'string' ? from : [from] };
+  const list = Array.isArray(from);
+  const body = { type: 'mtr', target, inProgressUpdates: true, measurementOptions, locations: list || typeof from === 'string' ? from : [from] };
+  if (list) body.limit = 1;   // one probe for the whole list, not one per location
   const r = await fetch(GP + '/measurements', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
   const j = await r.json().catch(() => null);
   const left = r.headers.get('x-ratelimit-remaining'), reset = r.headers.get('x-ratelimit-reset');
   const quota = left != null ? { left: +left, reset: +reset || 0 } : null;
-  if (!r.ok) { const e = new Error(j?.error?.message || 'HTTP ' + r.status); e.status = r.status; e.headers = r.headers; e.quota = quota; throw e; }
+  if (!r.ok) { const e = new Error(j?.error?.message || 'HTTP ' + r.status); e.status = r.status; e.type = j?.error?.type; e.headers = r.headers; e.quota = quota; throw e; }
   return { ...j, quota };
 }
 
@@ -269,4 +272,10 @@ export async function resolve(name, { type = 'A', ecs } = {}) {
     } catch {}
   }
   return [];
+}
+// Both address families of a name, in parallel: a name with only AAAA records needs the IPv6 path, and asking for the
+// wrong one is what makes Globalping answer "queryA ENODATA".
+export async function families(name) {
+  const [v4, v6] = await Promise.all([resolve(name), resolve(name, { type: 'AAAA' })]);
+  return { v4, v6 };
 }

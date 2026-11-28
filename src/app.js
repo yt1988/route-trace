@@ -124,15 +124,61 @@ document.querySelectorAll('.seg2').forEach((g) => g.addEventListener('click', (e
   const b = e.target.closest('button'); if (!b || b.disabled) return;
   g.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', x === b)); optsLabel();
 }));
-// The IP choice only means something when the target is a domain: it picks which of the domain's addresses the probe
-// traces to. An IP address is one family already, so the choice is hidden then, in both directions.
+// The IP choice only means something when the target has both families: it picks which of the domain's addresses the
+// probe traces to. An IP address is one family already, and a name that resolves to only one is the same case, so the
+// choice is hidden then, in both directions; the family next to the target says which one it is.
 const isV4 = (x) => /^\d+\.\d+\.\d+\.\d+$/.test(x || ''), isV6 = (x) => /^[0-9a-f:]+:[0-9a-f:]*$/i.test(x || '');
 const isIp = (x) => isV4(x) || isV6(x);
 const curTarget = () => (S.dir === 'out' ? S.target : backTarget());
+// 'v4' | 'v6' | 'dual' | 'none', or null while a name's records are still on their way.
+function famOf(x) {
+  if (!x) return null;
+  if (isV4(x)) return 'v4';
+  if (isV6(x)) return 'v6';
+  return S.fam?.for === x && !S.fam.pending ? S.fam.kind : null;
+}
+// A target only IPv6 (or IPv6 picked by hand on a dual-stack name) needs a probe that can reach IPv6: Globalping drops
+// the others itself, and the ordered location list in v6Plan is how the page asks for one.
+const needsV6 = (x) => { const f = famOf(x); return f === 'v6' || (f === 'dual' && opt('ipv') === '6'); };
+// What to tell Globalping: only a name takes ipVersion, and only when its family is known (a dual-stack one follows the
+// choice; unset means Globalping's own default of 4).
+function ipVersionFor(x) {
+  if (!x || isIp(x)) return undefined;
+  const f = famOf(x);
+  if (f === 'v6') return 6;
+  if (f === 'v4') return 4;
+  return opt('ipv') ? +opt('ipv') : undefined;
+}
+const famCache = new Map();   // a name's families for this page's lifetime; the probes' view of a name rarely changes
+let famSeq = 0, famAt = 0;
+function detectFamily(x = curTarget()) {
+  clearTimeout(famAt); famAt = 0;
+  if (!x) { S.fam = null; syncIp(); return; }
+  if (isIp(x)) { S.fam = { for: x, kind: isV6(x) ? 'v6' : 'v4', pending: false }; syncIp(); renderOrigin(); return; }
+  const had = famCache.get(x);
+  if (had) { S.fam = { for: x, kind: had, pending: false }; syncIp(); autoPick(); return; }
+  if (S.fam?.for === x && S.fam.pending) return;   // already on its way
+  const fam = (S.fam = { for: x, pending: true });
+  const seq = ++famSeq; syncIp();
+  // run() waits for this when Enter comes before the records do
+  fam.p = N.families(x).then(({ v4, v6 }) => {
+    const kind = v4.length && v6.length ? 'dual' : v6.length ? 'v6' : v4.length ? 'v4' : 'none';
+    famCache.set(x, kind);
+    if (seq !== famSeq) return;
+    fam.kind = kind; fam.pending = false;
+    syncIp(); syncGo(); autoPick();
+  }).catch(() => { if (seq === famSeq) { fam.kind = null; fam.pending = false; syncIp(); } });
+}
 function syncIp() {
-  const g = document.querySelector('.seg2[data-opt="ipv"]'), x = curTarget(), show = !!x && !isIp(x);
+  const g = document.querySelector('.seg2[data-opt="ipv"]'), x = curTarget(), f = famOf(x);
+  const show = !!x && (f === 'dual' || f === null);
   g.closest('.opt').hidden = !show;
   if (!show) g.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.v === ''));
+  const chip = $('#famChip');
+  if (chip) {
+    const label = f === 'dual' ? t('fam_dual') : f === 'v6' ? t('fam_v6only') : f === 'v4' ? t('fam_v4only') : f === 'none' ? t('fam_none') : '';
+    chip.hidden = !label; chip.textContent = label;
+  }
   optsLabel();
 }
 
@@ -149,6 +195,7 @@ async function init() {
   else { const m = new URLSearchParams(location.search).get('m'); if (m) openShared(m); }   // dev: reopen a Globalping id
   await Promise.all([probesP, meP]);
   if (S.dir === 'back' && S.target) await locateTarget();
+  detectFamily();
   autoPick(); syncGo();
 }
 function setExits(groups) {
@@ -239,7 +286,7 @@ function backShow(on) {
   $('#backList').hidden = !on; elBack.setAttribute('aria-expanded', on);
   if (on) backList();
 }
-function backSet() { S.backEdited = true; renderBackTo(); syncIp(); syncGo(); }
+function backSet() { S.backEdited = true; renderBackTo(); syncIp(); syncGo(); clearTimeout(famAt); famAt = setTimeout(() => detectFamily(backTarget()), 350); }
 elBack.addEventListener('focus', () => backShow(true));
 elBack.addEventListener('click', () => backShow(true));
 elBack.addEventListener('input', backSet);
@@ -286,7 +333,7 @@ document.querySelectorAll('.dir [data-dir]').forEach((b) => b.addEventListener('
   elTarget.hidden = S.dir === 'back'; $('#backBox').hidden = S.dir === 'out';
   S.ref = S.dir === 'out' ? 'home' : 'target';
   S.originAuto = true;
-  renderBackTo(); syncIp();
+  renderBackTo(); detectFamily(curTarget()); syncIp();
   // a return trace starts near the far end, the outbound target; without one the probe is picked by hand
   if (S.dir === 'back') {
     if (!S.target) { S.origin = null; renderOrigin(); syncGo(); return; }
@@ -294,7 +341,10 @@ document.querySelectorAll('.dir [data-dir]').forEach((b) => b.addEventListener('
   }
   autoPick(); syncGo();
 }));
-elTarget.addEventListener('input', () => { S.target = elTarget.value.trim(); store.set('rt:target', S.target); S.targetGeo = null; syncIp(); syncGo(); });
+elTarget.addEventListener('input', () => {
+  S.target = elTarget.value.trim(); store.set('rt:target', S.target); S.targetGeo = null; syncIp(); syncGo();
+  clearTimeout(famAt); famAt = setTimeout(() => detectFamily(S.target), 350);   // a name's A and AAAA, once typing pauses
+});
 elTarget.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !$('#go').disabled) run(); });
 $('#go').addEventListener('click', () => (S.running ? S.abort?.abort() : run()));
 function syncGo() {
@@ -326,7 +376,11 @@ async function locateTarget() {
   }
   if (S.targetGeo?.for === S.target) return S.targetGeo;
   let ip = S.target;
-  if (!/^\d+\.\d+\.\d+\.\d+$|:/.test(ip)) ip = (await N.resolve(S.target))[0] || null;
+  if (!isIp(ip)) {
+    // a name with only AAAA records has no A to find the target's place by
+    const first = famOf(S.target) === 'v6' ? 'AAAA' : 'A';
+    ip = (await N.resolve(S.target, { type: first }))[0] || (await N.resolve(S.target, { type: first === 'A' ? 'AAAA' : 'A' }))[0] || null;
+  }
   const g = ip ? await N.geoOf(ip) : null;
   S.targetGeo = g ? { ...g, ip, for: S.target, eyeball: false, near: true, weak: g.src === 'country' } : { for: S.target, ip, missing: true };
   return S.targetGeo;
@@ -339,11 +393,28 @@ function refPoint(ref = S.ref) {
   return S.me.home;
 }
 const refWord = (ref, km) => t(ref === 'target' ? 'ref_target' : ref.startsWith('x') ? 'ref_exit' : 'ref_home', { km });
+// What this browser has learned about a slot's IPv6 reach. Globalping keeps the per-probe fact to itself, but a run
+// that picked a location past others says those others had no IPv6 probe at that moment, and the one it picked did.
+const CAP_KEY = 'rt:v6cap', CAP_TTL = 7 * 864e5;
+const capRaw = store.get(CAP_KEY, {});
+function capOf(key) { const v = capRaw[key]; return v && Date.now() - v.t < CAP_TTL ? v.cap : null; }
+function capSet(key, cap) {
+  capRaw[key] = { cap, t: Date.now() };
+  const keys = Object.keys(capRaw);
+  if (keys.length > 500) delete capRaw[keys[0]];
+  store.set(CAP_KEY, capRaw);
+}
 function autoPick() {
   if (S.slots.length && S.originAuto) {
     const ref = refPoint();
-    const top = ref && L.rankSlots(S.slots, ref)[0];
-    S.origin = top ? { slot: top.s, m: top.m, ref: S.ref } : null;
+    if (needsV6(curTarget())) {
+      // the nearest slot we have seen carry IPv6, else the nearest one to try (run() hands Globalping the whole order)
+      const top = L.v6Plan(S.slots, ref, capOf)[0];
+      S.origin = top ? { slot: top.s, m: ref ? L.matchSlot(top.s, { ...ref, near: true }) : null, ref: S.ref, v6: true } : null;
+    } else {
+      const top = ref && L.rankSlots(S.slots, ref)[0];
+      S.origin = top ? { slot: top.s, m: top.m, ref: S.ref } : null;
+    }
   }
   renderOrigin(); if (!S.last?.a) idleGlobe();
 }
@@ -352,8 +423,11 @@ function renderOrigin() {
   if (!S.origin) { if (S.slots.length && S.me.ready) b.innerHTML = `<span class="m">${esc(t('pick'))}</span>`; syncGo(); return; }
   const { slot: s, m } = S.origin;
   const warn = S.origin.ref === 'target' && S.targetGeo?.weak ? `<span class="o-warn">${esc(t('anycast_warn'))}</span>` : '';
+  const v6 = needsV6(curTarget()) || S.origin.v6;
+  const cap = v6 ? capOf(s.key) : null;
+  const v6tag = v6 ? `<span class="tier g${cap === 'v6' ? 2 : 1}">${esc(t(cap === 'v6' ? 'fam_v6' : 'v6_todo'))}</span>` : '';
   b.innerHTML = `<span class="o-main"><b>${esc(city(s.city))}</b><span>${esc(shortOrg(s.network, s.asn))}</span><span class="m">AS${s.asn} · ${esc(t(s.eyeball ? 'eyeball' : 'dc'))}</span><span class="chg">${esc(t('change'))}</span></span>`
-    + `<span class="o-sub">${m ? `<span class="tier g${L.TIER_GOOD[m.tier]}">${esc(t('tier_' + m.tier))}</span><span class="m">${esc(refWord(S.origin.ref, kmTxt(m.km)))}</span>` : ''}${S.origin.ref === 'target' && S.targetGeo?.viaTrace ? `<span class="m">· ${esc(t('via_trace', { city: city(S.targetGeo.city) }))}</span>` : ''}</span>${warn}`;
+    + `<span class="o-sub">${v6tag}${m ? `<span class="tier g${L.TIER_GOOD[m.tier]}">${esc(t('tier_' + m.tier))}</span><span class="m">${esc(refWord(S.origin.ref, kmTxt(m.km)))}</span>` : ''}${S.origin.ref === 'target' && S.targetGeo?.viaTrace ? `<span class="m">· ${esc(t('via_trace', { city: city(S.targetGeo.city) }))}</span>` : ''}</span>${warn}`;
   syncGo();
 }
 
@@ -430,9 +504,9 @@ function pkRender() {
     return `<button type="button" class="pk-row${S.origin?.slot.key === s.key ? ' cur' : ''}" role="option" data-i="${pkRows.length - 1}">`
       + `<span class="t ${s.eyeball ? 'eye' : 'dc'}" title="${esc(t(s.eyeball ? 't_eye_tip' : 't_dc_tip'))}">${esc(t(s.eyeball ? 't_eye' : 't_dc'))}</span>`
       + `<span class="pk-main"><b>${esc(city(s.city))}</b> <span class="m">${esc(country(s.cc))}</span><br><span class="pk-net">${esc(shortOrg(s.network, s.asn))}</span> <span class="m">AS${s.asn}${s.count > 1 ? ` · ${esc(t('pk_count', { n: s.count }))}` : ''}</span></span>`
-      + `<span class="pk-side">${m ? `<span class="tier g${L.TIER_GOOD[m.tier]}">${esc(t('tier_' + m.tier))}</span><span class="m">${kmTxt(m.km)}</span>` : ''}</span></button>`;
+      + `<span class="pk-side">${(() => { const c = capOf(s.key); return c ? `<span class="cap${c === 'v6' ? ' on' : ''}">${esc(t(c === 'v6' ? 'fam_v6' : 'fam_v4only'))}</span>` : ''; })()}${m ? `<span class="tier g${L.TIER_GOOD[m.tier]}">${esc(t('tier_' + m.tier))}</span><span class="m">${kmTxt(m.km)}</span>` : ''}</span></button>`;
   }).join('')).join('') || `<p class="m pk-empty">${esc(t('pk_empty'))}</p>`;
-  $('#pkFoot').textContent = t('pk_foot', { n: num(S.slots.length) });
+  $('#pkFoot').textContent = needsV6(curTarget()) ? t('pk_foot_v6', { n: num(S.slots.length) }) : t('pk_foot', { n: num(S.slots.length) });
   const listed = new Set(pkRows.map((r) => r.s.key)), cityMap = new Map();
   for (const r of (q ? pkRows : pool)) {
     const s = r.s, k = s.lat.toFixed(1) + ',' + s.lon.toFixed(1);
@@ -457,8 +531,18 @@ async function run(opts = {}) {
   const [protocol, port] = opt('proto').split(':');
   const target = S.dir === 'out' ? S.target : backTarget();
   if (!target) return;
-  let from = opts.reuse && S.last?.id && S.last.slotKey === S.origin.slot.key ? S.last.id : L.locationFor(S.origin.slot);
   S.running = true; S.abort = new AbortController(); syncGo();
+  // A name's family decides both ipVersion and whether the probe must reach IPv6, and Enter can come before its records do.
+  if (!isIp(target) && !famOf(target)) {
+    detectFamily(target);
+    if (S.fam?.for === target && S.fam.p) await S.fam.p;
+    if (S.abort.signal.aborted) { S.running = false; syncGo(); return; }
+  }
+  // An IPv6 target: one request carrying the whole ordered list, so Globalping itself skips the locations where no probe
+  // can reach IPv6 and takes the first that can. A slot picked by hand is asked for as it stands (a 422 then says so).
+  const plan = needsV6(target) && S.originAuto && !opts.reuse ? L.v6Plan(S.slots, refPoint(), capOf) : null;
+  let from = plan ? L.v6Locations(plan, refPoint()?.cc || null)
+    : opts.reuse && S.last?.id && S.last.slotKey === S.origin.slot.key ? S.last.id : L.locationFor(S.origin.slot);
   // the visitor's own trace replaces a shared one: the banner goes, the address is the tool's again
   if (banner) { banner.remove(); banner = null; history.replaceState(null, '', PATHS[LANG] || '/'); }
   const s = S.origin.slot;
@@ -466,14 +550,15 @@ async function run(opts = {}) {
   runGlobe(s, target);
   const box = $('#result'); box.hidden = false;
   box.innerHTML = pathHead(S.dir, s, target) + `<div class="path-sum m" id="pathStatus"><span class="spin sm"></span>${esc(t('st_start'))}</div><div id="liveTl"></div>`;
-  S.live = { target };
+  S.live = { target, plan: plan && plan.map(({ s }) => s.key), multi: !!plan };
   try {
-    const mtr = (where) => N.startMtr({ target, from: where, packets: +opt('packets'), protocol, port: +port || 443, ipVersion: opt('ipv') ? +opt('ipv') : undefined });
-    // The probe list is a few minutes old; an automatic pick that has gone offline (422) gives way to the next best
+    const mtr = (where) => N.startMtr({ target, from: where, packets: +opt('packets'), protocol, port: +port || 443, ipVersion: ipVersionFor(target) });
+    // The probe list is a few minutes old; an automatic pick that has gone offline (422) gives way to the next best.
+    // A list (an IPv6 target) says nothing about one slot, so it is not retried this way.
     let started;
     for (let tries = 0; ; tries++) {
       try { started = await mtr(from); break; } catch (e) {
-        if (e.status !== 422 || !S.originAuto || tries >= 2 || typeof from === 'string') throw e;
+        if (e.status !== 422 || !S.originAuto || tries >= 2 || typeof from === 'string' || Array.isArray(from)) throw e;
         const ref = refPoint(), ranked = L.rankSlots(S.slots, ref).filter((r) => r.s.key !== S.origin.slot.key);
         S.slots = S.slots.filter((x) => x.key !== S.origin.slot.key);
         S.origin = { slot: ranked[0].s, m: ranked[0].m, ref: S.ref }; renderOrigin();
@@ -487,28 +572,55 @@ async function run(opts = {}) {
     const m = await N.follow(id, (m) => renderLive(m), S.abort.signal);
     const r = m.results?.[0];
     if (!r || r.result.status === 'failed') throw new Error(r?.result?.rawOutput?.split('\n')[0] || t('no_probe_result'));
-    S.last = { id, slotKey: S.origin.slot.key, target, dir: S.dir, m, r, ts: Date.now() };
+    S.last = { id, slotKey: (S.live?.slot || S.origin.slot).key, target, dir: S.dir, m, r, ts: Date.now() };
     await renderResult();
   } catch (e) {
     if (e.quota) showQuota(e.quota.left, e.quota.reset);
-    box.innerHTML = pathHead(S.dir, s, target) + `<div class="path-sum ${e.name === 'AbortError' ? 'm' : 'bad'}">${esc(e.name === 'AbortError' ? t('st_stopped') : errText(e))}</div>`;
+    // a slot picked by hand that cannot reach IPv6: one click back to an automatic pick
+    const canAuto = e.status === 422 && needsV6(target) && !S.originAuto;
+    box.innerHTML = pathHead(S.dir, s, target) + `<div class="path-sum ${e.name === 'AbortError' ? 'm' : 'bad'}">${esc(e.name === 'AbortError' ? t('st_stopped') : errText(e, needsV6(target)))}`
+      + (canAuto ? ` <button type="button" class="pri" id="v6auto">${esc(t('v6_auto'))}</button>` : '') + '</div>';
+    if (canAuto) $('#v6auto').onclick = () => { S.originAuto = true; autoPick(); run(); };
   } finally { S.running = false; syncGo(); }
 }
-function errText(e) {
+function errText(e, v6 = false) {
   if (e.status === 429) { const s = +e.headers?.get('X-RateLimit-Reset') || 0; return s ? t('err_429_wait', { min: Math.ceil(s / 60) }) : t('err_429'); }
-  if (e.status === 422) return t('err_422');
+  if (e.status === 422) return t(v6 ? 'err_422_v6' : 'err_422');
   if (e.code === 'timeout') return t('err_timeout');
   if (e.status === 400) return t('err_400', { msg: e.message });
   return t('err_other', { msg: e.message });
 }
 // hops as they come in (Globalping streams the first results), so the page shows progress right away
 function renderLive(m) {
+  const picked = m.results?.[0]?.probe;
+  if (picked && S.live?.multi && !S.live.learned) learnProbe(picked);
   const hops = m.results?.[0]?.result?.hops || [];
   if (hops.length && $('#pathStatus')) $('#pathStatus').innerHTML = `<span class="spin sm"></span>${esc(t('st_hops', { n: hops.length }))}`;
   const el = $('#liveTl'); if (!el || !hops.length) return;
   // the hops so far, in the result's own layout: networks from Globalping's AS numbers, places come with the result
   const probe = m.results[0].probe;
   el.innerHTML = timeline(L.analyze(hops.map((h) => (h.stats ? h : { ...h, stats: { rcv: 0, total: 0, loss: 100 } })), probe, new Map()), S.live?.target, true);
+}
+
+// The probe Globalping picked out of the ordered list is the first location that had one able to reach IPv6: remember
+// it, and remember that every location before it in that list had none at that moment. The header, the origin button
+// and the map then show the probe that is actually running.
+function learnProbe(p) {
+  const key = [p.country, p.city, p.asn, (p.tags || []).includes('eyeball-network') ? 'e' : 'd'].join('|');
+  const plan = S.live?.plan || [], at = plan.indexOf(key);
+  if (at > 0) plan.slice(0, at).forEach((k) => { if (capOf(k) !== 'v6') capSet(k, 'v4'); });
+  capSet(key, 'v6');
+  const slot = S.slots.find((s) => s.key === key) || {
+    key, cc: p.country, city: p.city, state: p.state, asn: p.asn, network: p.network, lat: p.latitude, lon: p.longitude,
+    eyeball: (p.tags || []).includes('eyeball-network'), count: 1, tags: p.tags || [], family: L.family(p.asn, p.network),
+  };
+  S.live = { ...S.live, learned: true, slot };
+  const ref = refPoint();
+  S.origin = { ...S.origin, slot, m: ref ? L.matchSlot(slot, { ...ref, near: true }) : null };
+  renderOrigin();
+  const ctx = $('#result .path-h .ctx');
+  if (ctx) ctx.innerHTML = `${esc(t('probe_of', { city: city(slot.city), net: shortOrg(slot.network, slot.asn) }))} → <b>${esc(S.live.target)}</b>`;
+  runGlobe(slot, S.live.target);
 }
 
 // While a trace runs, the map shows that trace: its probe and, when known, where it goes, joined by a dashed line

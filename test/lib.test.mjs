@@ -213,6 +213,36 @@ test('return probes: closeness to the target first', () => {
   assert.equal(r[2].s.city, 'Los Angeles');
 });
 
+test('IPv6 plan: known v6 slots first, learned v4-only slots dropped, the rest by distance', () => {
+  const ref = { lat: 31.23, lon: 121.47, cc: 'CN', city: 'Shanghai' };
+  const mk = (asn, city, lat, lon, eyeball = true) => ({ key: `CN|${city}|${asn}`, cc: 'CN', city, asn, lat, lon, eyeball, network: '', family: L.family(asn, ''), tags: [] });
+  const shanghai = mk(4808, 'Shanghai', 31.23, 121.47);
+  const wuhu = mk(4837, 'Wuhu', 31.35, 118.43);
+  const beijing = mk(4808, 'Beijing', 39.9, 116.4);
+  const chengdu = mk(4134, 'Chengdu', 30.57, 104.07, false);
+  const cap = new Map([[wuhu.key, 'v4'], [beijing.key, 'v6'], [chengdu.key, 'v6']]);
+  const capOf = (k) => cap.get(k) || null;
+  const plan = L.v6Plan([shanghai, wuhu, beijing, chengdu], ref, capOf);
+  // v4-only Wuhu is skipped even though it is the closest; Shanghai (never tried) follows the known v6 pair
+  assert.deepEqual(plan.map((p) => p.s.city), ['Beijing', 'Chengdu', 'Shanghai']);
+  assert.equal(L.v6Plan([shanghai, wuhu, beijing, chengdu], ref, capOf, { limit: 2 }).length, 2);
+  // a target we know nothing about keeps every slot, nearest first
+  assert.deepEqual(L.v6Plan([beijing, wuhu, shanghai], ref, () => null).map((p) => p.s.city), ['Shanghai', 'Wuhu', 'Beijing']);
+});
+
+test('IPv6 locations: one ordered list, the country last', () => {
+  const plan = [
+    { s: { cc: 'CN', city: 'Beijing', asn: 4808, eyeball: true } },
+    { s: { cc: 'CN', city: 'Chengdu', asn: 4134, eyeball: false } },
+  ];
+  assert.deepEqual(L.v6Locations(plan, 'CN'), [
+    { country: 'CN', city: 'Beijing', asn: 4808, tags: ['eyeball-network'] },
+    { country: 'CN', city: 'Chengdu', asn: 4134, tags: ['datacenter-network'] },
+    { country: 'CN' },
+  ]);
+  assert.equal(L.v6Locations(plan, null).length, 2);
+});
+
 test('an exchange hop known to PeeringDB: its own line, the member, the exchange city', () => {
   const m2 = JSON.parse(readFileSync(new URL('./fixtures/mtr-xian-unicom-x.json', import.meta.url)));
   const geo = new Map(JSON.parse(readFileSync(new URL('./fixtures/geo-xian.json', import.meta.url))).map((g) => [g.ip, L.geoFromDb(g)]));
