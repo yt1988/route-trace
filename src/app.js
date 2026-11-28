@@ -397,6 +397,7 @@ const refWord = (ref, km) => t(ref === 'target' ? 'ref_target' : ref.startsWith(
 // that picked a location past others says those others had no IPv6 probe at that moment, and the one it picked did.
 const CAP_KEY = 'rt:v6cap', CAP_TTL = 7 * 864e5;
 const capRaw = store.get(CAP_KEY, {});
+const probeKey = (p) => [p.country, p.city, p.asn, (p.tags || []).includes('eyeball-network') ? 'e' : 'd'].join('|');
 function capOf(key) { const v = capRaw[key]; return v && Date.now() - v.t < CAP_TTL ? v.cap : null; }
 function capSet(key, cap) {
   capRaw[key] = { cap, t: Date.now() };
@@ -606,7 +607,7 @@ function renderLive(m) {
 // it, and remember that every location before it in that list had none at that moment. The header, the origin button
 // and the map then show the probe that is actually running.
 function learnProbe(p) {
-  const key = [p.country, p.city, p.asn, (p.tags || []).includes('eyeball-network') ? 'e' : 'd'].join('|');
+  const key = probeKey(p);
   const plan = S.live?.plan || [], at = plan.indexOf(key);
   if (at > 0) plan.slice(0, at).forEach((k) => { if (capOf(k) !== 'v6') capSet(k, 'v4'); });
   capSet(key, 'v6');
@@ -660,6 +661,12 @@ async function renderResult() {
   const a = L.analyze(hops, r.probe, geo);
   S.last.a = a;
   const p = r.probe;
+  // the result is its own proof: this probe carried a trace to a target that only has IPv6, whether it was picked out
+  // of an ordered list, reused, opened from a share link or chosen by hand
+  if (needsV6(target)) {
+    capSet(probeKey(p), 'v6');
+    if (S.origin?.slot.key === probeKey(p)) renderOrigin();
+  }
 
   // the path, in order, open: what was measured, its numbers in one line, then the line itself
   const lossCls = a.realLoss >= 5 ? 'bad' : a.realLoss > 0 ? 'warn' : '';
